@@ -28,6 +28,16 @@ export function Room() {
     );
   }
 
+  const overlay =
+    !state.hostConnected && state.phase !== 'lobby' ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="rounded-2xl bg-white px-8 py-6 text-center shadow-xl">
+          <p className="text-lg font-semibold">Host disconnected</p>
+          <p className="text-slate-600">Waiting for them to reconnect…</p>
+        </div>
+      </div>
+    ) : null;
+
   if (state.phase === 'lobby') {
     return <Lobby state={state} me={me} send={send} roomCode={code!} />;
   }
@@ -39,6 +49,7 @@ export function Room() {
           <FinalJeopardy state={state} me={me} send={send} />
         </main>
         <Scoreboard state={state} />
+        {overlay}
       </div>
     );
   }
@@ -50,6 +61,7 @@ export function Room() {
           <GameOver state={state} me={me} send={send} />
         </main>
         <Scoreboard state={state} />
+        {overlay}
       </div>
     );
   }
@@ -63,6 +75,7 @@ export function Room() {
       {CLUE_PHASES.includes(state.phase as any) && (
         <ClueModal state={state} me={me} send={send} />
       )}
+      {overlay}
     </div>
   );
 }

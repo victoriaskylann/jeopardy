@@ -63,6 +63,7 @@ export type GamePhase =
 export type RoomState = {
   phase: GamePhase;
   hostId: string | null;
+  hostConnected: boolean;
   players: Player[];
   game: Game | null;
   board: BoardState | null;

@@ -37,6 +37,10 @@ export default class JeopardyServer implements Party.Server {
       this.state = markReconnected(this.state, conn.id);
     }
 
+    if (conn.id === this.state.hostId) {
+      this.state = { ...this.state, hostConnected: true };
+    }
+
     this.persist();
 
     const isHost = this.state.hostId === conn.id;
@@ -48,8 +52,7 @@ export default class JeopardyServer implements Party.Server {
 
   onClose(conn: Party.Connection) {
     if (conn.id === this.state.hostId) {
-      // Host disconnect: keep host slot, just mark connection state implicitly via UI.
-      // (Auto-host-transfer is a stretch goal; v1 simply waits.)
+      this.state = { ...this.state, hostConnected: false };
     }
     this.state = markDisconnected(this.state, conn.id);
     this.persist();

@@ -5,6 +5,7 @@ export function createInitialState(): RoomState {
   return {
     phase: 'lobby',
     hostId: null,
+    hostConnected: true,
     players: [],
     game: null,
     board: null,
@@ -103,7 +104,7 @@ function handleClaimHost(state: RoomState, senderId: string): ApplyResult {
   if (state.hostId !== null) {
     return { ok: false, error: 'Host already claimed' };
   }
-  return { ok: true, state: { ...state, hostId: senderId } };
+  return { ok: true, state: { ...state, hostId: senderId, hostConnected: true } };
 }
 
 function handleSelectGame(state: RoomState, gameId: string, senderId: string): ApplyResult {
