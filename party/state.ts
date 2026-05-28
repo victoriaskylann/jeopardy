@@ -54,6 +54,10 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleRevealFinalClue(state, senderId);
     case 'submitFinalAnswer':
       return handleSubmitFinalAnswer(state, event.answer, senderId);
+    case 'revealFinalPlayer':
+      return handleRevealFinalPlayer(state, event.playerId, event.correct, senderId);
+    case 'endGame':
+      return handleEndGame(state, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -291,6 +295,57 @@ function handleSubmitFinalAnswer(state: RoomState, answer: string, senderId: str
       ...state,
       phase: allSubmitted ? 'finalReveal' : state.phase,
       finalJeopardy: newFj,
+    },
+  };
+}
+
+function handleRevealFinalPlayer(
+  state: RoomState,
+  playerId: string,
+  correct: boolean,
+  senderId: string,
+): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'finalReveal') return { ok: false, error: 'Not in reveal phase' };
+  if (!state.finalJeopardy) return { ok: false, error: 'No final state' };
+  if (state.finalJeopardy.revealed.includes(playerId)) {
+    return { ok: false, error: 'Player already revealed' };
+  }
+  const wager = state.finalJeopardy.wagers[playerId];
+  if (wager === undefined) return { ok: false, error: 'Player did not wager' };
+
+  const newScore = (state.scores[playerId] ?? 0) + (correct ? wager : -wager);
+  const scores = { ...state.scores, [playerId]: newScore };
+  const revealed = [...state.finalJeopardy.revealed, playerId];
+  const eligible = eligibleForFinal({ ...state, scores: state.scores });
+  const allRevealed = eligible.every((id) => revealed.includes(id));
+
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: allRevealed ? 'gameOver' : state.phase,
+      scores,
+      finalJeopardy: { ...state.finalJeopardy, revealed },
+    },
+  };
+}
+
+function handleEndGame(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'gameOver') return { ok: false, error: 'Game not over' };
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'lobby',
+      board: null,
+      selectedClue: null,
+      buzzer: { status: 'closed' },
+      pickerId: null,
+      scores: {},
+      game: null,
+      finalJeopardy: null,
     },
   };
 }

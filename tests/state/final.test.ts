@@ -137,3 +137,83 @@ describe('submitFinalAnswer', () => {
     expect(result.ok).toBe(false);
   });
 });
+
+describe('revealFinalPlayer', () => {
+  function readyToReveal(): RoomState {
+    let state = roundCompleteRoom({ p0: 1000, p1: 500 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 500 }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalClue' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalAnswer', answer: 'X' }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalAnswer', answer: 'Y' }, 'p1') as any).state;
+    return state;
+  }
+
+  it('correct reveal adds wager to score', () => {
+    const state = readyToReveal();
+    const result = applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: true }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.scores.p0).toBe(1800);
+    expect(result.state.finalJeopardy?.revealed).toContain('p0');
+  });
+
+  it('wrong reveal subtracts wager from score', () => {
+    const state = readyToReveal();
+    const result = applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: false }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.scores.p0).toBe(200);
+  });
+
+  it('after all eligible players revealed, phase transitions to gameOver', () => {
+    let state = readyToReveal();
+    state = (applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: true }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p1', correct: false }, 'host') as any).state;
+    expect(state.phase).toBe('gameOver');
+  });
+
+  it('cannot reveal the same player twice', () => {
+    let state = readyToReveal();
+    state = (applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: true }, 'host') as any).state;
+    const result = applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: true }, 'host');
+    expect(result.ok).toBe(false);
+  });
+
+  it('non-host cannot reveal', () => {
+    const state = readyToReveal();
+    const result = applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: true }, 'p0');
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe('endGame', () => {
+  it('returns to lobby with players kept, scores cleared, game cleared', () => {
+    let state = roundCompleteRoom({ p0: 1000, p1: 500 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 500 }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalClue' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalAnswer', answer: 'X' }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalAnswer', answer: 'Y' }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p0', correct: true }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalPlayer', playerId: 'p1', correct: false }, 'host') as any).state;
+
+    const result = applyEvent(state, { type: 'endGame' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('lobby');
+    expect(result.state.players).toHaveLength(2);
+    expect(result.state.scores).toEqual({});
+    expect(result.state.game).toBeNull();
+    expect(result.state.finalJeopardy).toBeNull();
+    expect(result.state.board).toBeNull();
+  });
+
+  it('non-host cannot end game', () => {
+    let state = roundCompleteRoom({ p0: 1000 });
+    const result = applyEvent(state, { type: 'endGame' }, 'p0');
+    expect(result.ok).toBe(false);
+  });
+});
