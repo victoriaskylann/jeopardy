@@ -1,4 +1,5 @@
 import type { RoomState, ClientEvent } from '../src/types';
+import { getGameById } from '../src/games/manifest';
 
 export function createInitialState(): RoomState {
   return {
@@ -27,6 +28,10 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleSetNickname(state, event.nickname, senderId);
     case 'claimHost':
       return handleClaimHost(state, senderId);
+    case 'selectGame':
+      return handleSelectGame(state, event.gameId, senderId);
+    case 'startGame':
+      return handleStartGame(state, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -71,4 +76,35 @@ function handleClaimHost(state: RoomState, senderId: string): ApplyResult {
     return { ok: false, error: 'Host already claimed' };
   }
   return { ok: true, state: { ...state, hostId: senderId } };
+}
+
+function handleSelectGame(state: RoomState, gameId: string, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host can select game' };
+  if (state.phase !== 'lobby') return { ok: false, error: 'Game already started' };
+  const game = getGameById(gameId);
+  if (!game) return { ok: false, error: 'Unknown game' };
+  return { ok: true, state: { ...state, game } };
+}
+
+function handleStartGame(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host can start' };
+  if (state.phase !== 'lobby') return { ok: false, error: 'Game already started' };
+  if (!state.game) return { ok: false, error: 'No game selected' };
+  if (state.players.length < 2) return { ok: false, error: 'Need at least 2 players' };
+
+  const revealed = state.game.jeopardyRound.categories.map((c) => c.clues.map(() => false));
+  const scores: Record<string, number> = {};
+  for (const p of state.players) scores[p.id] = 0;
+  const pickerId = state.players[0].id;
+
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'selectingClue',
+      board: { revealed },
+      scores,
+      pickerId,
+    },
+  };
 }
