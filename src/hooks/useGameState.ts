@@ -4,6 +4,16 @@ import type { ClientEvent, RoomState, ServerEvent } from '../types';
 
 export type Me = { playerId: string; isHost: boolean };
 
+function getOrCreateClientId(): string {
+  const KEY = 'jepardy-client-id';
+  let id = localStorage.getItem(KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(KEY, id);
+  }
+  return id;
+}
+
 export function useGameState(roomCode: string) {
   const [state, setState] = useState<RoomState | null>(null);
   const [me, setMe] = useState<Me | null>(null);
@@ -11,7 +21,11 @@ export function useGameState(roomCode: string) {
 
   useEffect(() => {
     const host = import.meta.env.VITE_PARTYKIT_HOST || 'localhost:1999';
-    const socket = new PartySocket({ host, room: roomCode });
+    const socket = new PartySocket({
+      host,
+      room: roomCode,
+      id: getOrCreateClientId(),
+    });
     socketRef.current = socket;
 
     const onMessage = (e: MessageEvent) => {
