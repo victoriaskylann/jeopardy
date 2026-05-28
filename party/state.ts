@@ -32,6 +32,10 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleSelectGame(state, event.gameId, senderId);
     case 'startGame':
       return handleStartGame(state, senderId);
+    case 'selectClue':
+      return handleSelectClue(state, event.categoryIdx, event.clueIdx, senderId);
+    case 'openBuzzer':
+      return handleOpenBuzzer(state, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -106,5 +110,38 @@ function handleStartGame(state: RoomState, senderId: string): ApplyResult {
       scores,
       pickerId,
     },
+  };
+}
+
+function handleSelectClue(state: RoomState, categoryIdx: number, clueIdx: number, senderId: string): ApplyResult {
+  if (state.phase !== 'selectingClue') return { ok: false, error: 'Not in selecting phase' };
+  if (state.pickerId !== senderId) return { ok: false, error: 'Not your turn to pick' };
+  if (!state.board || !state.game) return { ok: false, error: 'No board' };
+  if (categoryIdx < 0 || categoryIdx >= 6 || clueIdx < 0 || clueIdx >= 5) {
+    return { ok: false, error: 'Invalid clue coordinates' };
+  }
+  if (state.board.revealed[categoryIdx][clueIdx]) return { ok: false, error: 'Clue already played' };
+
+  const revealed = state.board.revealed.map((row) => [...row]);
+  revealed[categoryIdx][clueIdx] = true;
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'clueRevealed',
+      selectedClue: { categoryIdx, clueIdx },
+      board: { revealed },
+    },
+  };
+}
+
+function handleOpenBuzzer(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'clueRevealed' && state.phase !== 'judging') {
+    return { ok: false, error: 'Cannot open buzzer in current phase' };
+  }
+  return {
+    ok: true,
+    state: { ...state, phase: 'buzzerOpen', buzzer: { status: 'open', openedAt: Date.now() } },
   };
 }
