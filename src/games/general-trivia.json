@@ -1,0 +1,73 @@
+{
+  "id": "general-trivia",
+  "title": "General Trivia",
+  "jeopardyRound": {
+    "categories": [
+      {
+        "name": "World Capitals",
+        "clues": [
+          { "value": 200, "clue": "This capital of France sits on the Seine.", "answer": "What is Paris?" },
+          { "value": 400, "clue": "Capital of Japan since 1868.", "answer": "What is Tokyo?" },
+          { "value": 600, "clue": "This South American capital is the highest in the world.", "answer": "What is La Paz?" },
+          { "value": 800, "clue": "Capital that shares its name with a US state.", "answer": "What is Washington (D.C.)?" },
+          { "value": 1000, "clue": "Capital of Burkina Faso.", "answer": "What is Ouagadougou?" }
+        ]
+      },
+      {
+        "name": "Movies",
+        "clues": [
+          { "value": 200, "clue": "1997 film featuring an iceberg.", "answer": "What is Titanic?" },
+          { "value": 400, "clue": "George Lucas franchise that began in 1977.", "answer": "What is Star Wars?" },
+          { "value": 600, "clue": "Quentin Tarantino film with Mia Wallace.", "answer": "What is Pulp Fiction?" },
+          { "value": 800, "clue": "Director of Inception and Interstellar.", "answer": "Who is Christopher Nolan?" },
+          { "value": 1000, "clue": "First Best Picture winner at the Oscars (1929).", "answer": "What is Wings?" }
+        ]
+      },
+      {
+        "name": "Science",
+        "clues": [
+          { "value": 200, "clue": "Chemical symbol Au.", "answer": "What is gold?" },
+          { "value": 400, "clue": "Force that pulls objects toward Earth.", "answer": "What is gravity?" },
+          { "value": 600, "clue": "Largest planet in our solar system.", "answer": "What is Jupiter?" },
+          { "value": 800, "clue": "Number of bones in the adult human body.", "answer": "What is 206?" },
+          { "value": 1000, "clue": "The unit of electrical resistance.", "answer": "What is the ohm?" }
+        ]
+      },
+      {
+        "name": "Literature",
+        "clues": [
+          { "value": 200, "clue": "Author of Romeo and Juliet.", "answer": "Who is Shakespeare?" },
+          { "value": 400, "clue": "Bilbo Baggins’ creator.", "answer": "Who is J.R.R. Tolkien?" },
+          { "value": 600, "clue": "Author of Pride and Prejudice.", "answer": "Who is Jane Austen?" },
+          { "value": 800, "clue": "Russian author of War and Peace.", "answer": "Who is Tolstoy?" },
+          { "value": 1000, "clue": "Author of One Hundred Years of Solitude.", "answer": "Who is Gabriel García Márquez?" }
+        ]
+      },
+      {
+        "name": "Sports",
+        "clues": [
+          { "value": 200, "clue": "Number of players on a soccer team on the field.", "answer": "What is 11?" },
+          { "value": 400, "clue": "Sport played at Wimbledon.", "answer": "What is tennis?" },
+          { "value": 600, "clue": "City of the 2020 Summer Olympics.", "answer": "What is Tokyo?" },
+          { "value": 800, "clue": "NBA team that won 3 straight titles 1991–1993.", "answer": "Who are the Chicago Bulls?" },
+          { "value": 1000, "clue": "First woman to win an Olympic marathon (1984).", "answer": "Who is Joan Benoit?" }
+        ]
+      },
+      {
+        "name": "Food & Drink",
+        "clues": [
+          { "value": 200, "clue": "Italian flatbread topped with sauce and cheese.", "answer": "What is pizza?" },
+          { "value": 400, "clue": "Country that originated sushi.", "answer": "What is Japan?" },
+          { "value": 600, "clue": "Bean used to make most chocolate.", "answer": "What is cacao?" },
+          { "value": 800, "clue": "Spice derived from crocus flowers.", "answer": "What is saffron?" },
+          { "value": 1000, "clue": "French term for a kitchen mise en place head.", "answer": "What is chef de partie?" }
+        ]
+      }
+    ]
+  },
+  "finalJeopardy": {
+    "category": "World History",
+    "clue": "This 1648 treaty ended the Thirty Years' War.",
+    "answer": "What is the Peace of Westphalia?"
+  }
+}
