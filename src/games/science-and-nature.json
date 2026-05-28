@@ -1,0 +1,73 @@
+{
+  "id": "science-and-nature",
+  "title": "Science & Nature",
+  "jeopardyRound": {
+    "categories": [
+      {
+        "name": "Chemistry",
+        "clues": [
+          { "value": 200, "clue": "Chemical formula for water.", "answer": "What is H2O?" },
+          { "value": 400, "clue": "Most abundant gas in Earth's atmosphere.", "answer": "What is nitrogen?" },
+          { "value": 600, "clue": "Element with atomic number 1.", "answer": "What is hydrogen?" },
+          { "value": 800, "clue": "pH range of pure water.", "answer": "What is 7?" },
+          { "value": 1000, "clue": "Russian chemist who organized the periodic table.", "answer": "Who is Mendeleev?" }
+        ]
+      },
+      {
+        "name": "Physics",
+        "clues": [
+          { "value": 200, "clue": "Force that opposes motion between two surfaces.", "answer": "What is friction?" },
+          { "value": 400, "clue": "Unit of electric current.", "answer": "What is the ampere (or amp)?" },
+          { "value": 600, "clue": "Approximate speed of light in m/s.", "answer": "What is 3 × 10^8 (or 299,792,458)?" },
+          { "value": 800, "clue": "Scientist who described general relativity in 1915.", "answer": "Who is Einstein?" },
+          { "value": 1000, "clue": "Subatomic particle responsible for the strong force.", "answer": "What is the gluon?" }
+        ]
+      },
+      {
+        "name": "Biology",
+        "clues": [
+          { "value": 200, "clue": "Organ that pumps blood.", "answer": "What is the heart?" },
+          { "value": 400, "clue": "Powerhouse of the cell.", "answer": "What is the mitochondrion?" },
+          { "value": 600, "clue": "Cellular process producing ATP from glucose.", "answer": "What is respiration (or glycolysis)?" },
+          { "value": 800, "clue": "Theorist of natural selection.", "answer": "Who is Darwin?" },
+          { "value": 1000, "clue": "Letters in the central dogma after DNA and before protein.", "answer": "What is RNA?" }
+        ]
+      },
+      {
+        "name": "Astronomy",
+        "clues": [
+          { "value": 200, "clue": "Star at the center of our solar system.", "answer": "What is the Sun?" },
+          { "value": 400, "clue": "Planet known for its rings.", "answer": "What is Saturn?" },
+          { "value": 600, "clue": "Galaxy containing our solar system.", "answer": "What is the Milky Way?" },
+          { "value": 800, "clue": "Reclassified as a dwarf planet in 2006.", "answer": "What is Pluto?" },
+          { "value": 1000, "clue": "First woman in space (1963).", "answer": "Who is Valentina Tereshkova?" }
+        ]
+      },
+      {
+        "name": "Animals",
+        "clues": [
+          { "value": 200, "clue": "Largest land mammal.", "answer": "What is the African elephant?" },
+          { "value": 400, "clue": "Only mammal that lays eggs (one of two).", "answer": "What is the platypus?" },
+          { "value": 600, "clue": "Bird that cannot fly and lives in Antarctica.", "answer": "What is the penguin?" },
+          { "value": 800, "clue": "Class of animals that includes frogs and salamanders.", "answer": "What are amphibians?" },
+          { "value": 1000, "clue": "Apex predator of the open ocean known by its dorsal fin.", "answer": "What is the great white shark?" }
+        ]
+      },
+      {
+        "name": "Earth Science",
+        "clues": [
+          { "value": 200, "clue": "Solid outermost layer of the Earth.", "answer": "What is the crust?" },
+          { "value": 400, "clue": "Scale measuring earthquake magnitude.", "answer": "What is the Richter scale?" },
+          { "value": 600, "clue": "Process by which water vapor becomes rain.", "answer": "What is condensation (or precipitation)?" },
+          { "value": 800, "clue": "Largest ocean on Earth.", "answer": "What is the Pacific?" },
+          { "value": 1000, "clue": "Boundary between two tectonic plates moving apart.", "answer": "What is a divergent boundary?" }
+        ]
+      }
+    ]
+  },
+  "finalJeopardy": {
+    "category": "Discoveries",
+    "clue": "This British scientist proposed the structure of DNA with James Watson in 1953.",
+    "answer": "Who is Francis Crick?"
+  }
+}

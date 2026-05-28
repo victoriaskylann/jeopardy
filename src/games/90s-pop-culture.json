@@ -1,0 +1,73 @@
+{
+  "id": "90s-pop-culture",
+  "title": "90s Pop Culture",
+  "jeopardyRound": {
+    "categories": [
+      {
+        "name": "90s TV",
+        "clues": [
+          { "value": 200, "clue": "Sitcom about a Manhattan apartment shared by four neurotic friends.", "answer": "What is Seinfeld?" },
+          { "value": 400, "clue": "Show where Will moved from West Philadelphia to live with his aunt and uncle.", "answer": "What is The Fresh Prince of Bel-Air?" },
+          { "value": 600, "clue": "Sci-fi show about FBI agents investigating the paranormal.", "answer": "What is The X-Files?" },
+          { "value": 800, "clue": "Cartoon featuring a yellow family living in Springfield.", "answer": "What is The Simpsons?" },
+          { "value": 1000, "clue": "HBO drama about a New Jersey mob boss in therapy.", "answer": "What is The Sopranos?" }
+        ]
+      },
+      {
+        "name": "90s Music",
+        "clues": [
+          { "value": 200, "clue": "Boy band including Justin Timberlake.", "answer": "What is NSYNC?" },
+          { "value": 400, "clue": "Band fronted by Kurt Cobain.", "answer": "What is Nirvana?" },
+          { "value": 600, "clue": "Spice Girls member known as 'Scary'.", "answer": "Who is Mel B?" },
+          { "value": 800, "clue": "Hit 1997 song by Hanson.", "answer": "What is MMMBop?" },
+          { "value": 1000, "clue": "Album by Lauryn Hill released in 1998.", "answer": "What is The Miseducation of Lauryn Hill?" }
+        ]
+      },
+      {
+        "name": "90s Movies",
+        "clues": [
+          { "value": 200, "clue": "1994 film featuring Forrest, Jenny, and a box of chocolates.", "answer": "What is Forrest Gump?" },
+          { "value": 400, "clue": "1997 disaster film involving an iceberg.", "answer": "What is Titanic?" },
+          { "value": 600, "clue": "Pulp Fiction director.", "answer": "Who is Quentin Tarantino?" },
+          { "value": 800, "clue": "1999 film with a major twist about Bruce Willis's character.", "answer": "What is The Sixth Sense?" },
+          { "value": 1000, "clue": "1996 indie film starring Frances McDormand as a pregnant police chief.", "answer": "What is Fargo?" }
+        ]
+      },
+      {
+        "name": "Video Games",
+        "clues": [
+          { "value": 200, "clue": "Plumber who rescues Princess Peach.", "answer": "Who is Mario?" },
+          { "value": 400, "clue": "Blue speedy hedgehog from Sega.", "answer": "Who is Sonic?" },
+          { "value": 600, "clue": "1996 game introducing Pikachu to the world.", "answer": "What is Pokémon Red/Blue?" },
+          { "value": 800, "clue": "1997 Square RPG starring Cloud Strife.", "answer": "What is Final Fantasy VII?" },
+          { "value": 1000, "clue": "1998 Zelda game introducing Ocarina puzzles.", "answer": "What is Ocarina of Time?" }
+        ]
+      },
+      {
+        "name": "Tech & Internet",
+        "clues": [
+          { "value": 200, "clue": "Company founded by Steve Jobs and Steve Wozniak.", "answer": "What is Apple?" },
+          { "value": 400, "clue": "AOL stood for this.", "answer": "What is America Online?" },
+          { "value": 600, "clue": "Search engine that began as 'BackRub' in 1996.", "answer": "What is Google?" },
+          { "value": 800, "clue": "Operating system Microsoft launched in 1995.", "answer": "What is Windows 95?" },
+          { "value": 1000, "clue": "Browser whose Mosaic-derived code led to Mozilla.", "answer": "What is Netscape?" }
+        ]
+      },
+      {
+        "name": "Fads",
+        "clues": [
+          { "value": 200, "clue": "Stuffed bean-filled toys collected throughout the 90s.", "answer": "What are Beanie Babies?" },
+          { "value": 400, "clue": "Disc with images that flipped via a launcher.", "answer": "What are POGS?" },
+          { "value": 600, "clue": "Virtual pets housed in egg-shaped devices.", "answer": "What are Tamagotchis?" },
+          { "value": 800, "clue": "Slap bracelet color came from this kind of strip.", "answer": "What is metal (or steel)?" },
+          { "value": 1000, "clue": "Cult-favorite plush moose-cow hybrid by Nickelodeon.", "answer": "What is Stimpy (or Ren & Stimpy)?" }
+        ]
+      }
+    ]
+  },
+  "finalJeopardy": {
+    "category": "Late 90s",
+    "clue": "1999 dot-com search engine whose Super Bowl ad featured a sock puppet.",
+    "answer": "What is Pets.com?"
+  }
+}
