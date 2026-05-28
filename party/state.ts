@@ -46,6 +46,10 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleMoveOn(state, senderId);
     case 'closeBuzzer':
       return handleCloseBuzzer(state, senderId);
+    case 'revealFinalCategory':
+      return handleRevealFinalCategory(state, senderId);
+    case 'submitFinalWager':
+      return handleSubmitFinalWager(state, event.wager, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -207,6 +211,40 @@ function handleCloseBuzzer(state: RoomState, senderId: string): ApplyResult {
       ...state,
       phase: 'judging',
       buzzer: { status: 'closed' },
+    },
+  };
+}
+
+function handleRevealFinalCategory(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'roundComplete') return { ok: false, error: 'Round not complete' };
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'finalCategoryShown',
+      finalJeopardy: { wagers: {}, answers: {}, submitted: [], revealed: [] },
+    },
+  };
+}
+
+function handleSubmitFinalWager(state: RoomState, wager: number, senderId: string): ApplyResult {
+  if (state.phase !== 'finalCategoryShown') return { ok: false, error: 'Not accepting wagers' };
+  if (!state.finalJeopardy) return { ok: false, error: 'Final Jeopardy not initialized' };
+  const score = state.scores[senderId];
+  if (score === undefined) return { ok: false, error: 'Not a player' };
+  if (score <= 0) return { ok: false, error: 'Score must be positive to wager' };
+  if (!Number.isFinite(wager) || wager < 0 || wager > score) {
+    return { ok: false, error: 'Wager must be between 0 and your current score' };
+  }
+  return {
+    ok: true,
+    state: {
+      ...state,
+      finalJeopardy: {
+        ...state.finalJeopardy,
+        wagers: { ...state.finalJeopardy.wagers, [senderId]: wager },
+      },
     },
   };
 }
