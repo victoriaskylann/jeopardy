@@ -50,6 +50,16 @@ describe('revealFinalCategory', () => {
   });
 });
 
+describe('revealFinalCategory with no eligible players', () => {
+  it('transitions directly to gameOver if no one has positive score', () => {
+    const state = roundCompleteRoom({ p0: 0, p1: -100 });
+    const result = applyEvent(state, { type: 'revealFinalCategory' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('gameOver');
+  });
+});
+
 describe('submitFinalWager', () => {
   it('eligible player (positive score) can submit wager up to their score', () => {
     let state = roundCompleteRoom({ p0: 1000, p1: 500 });

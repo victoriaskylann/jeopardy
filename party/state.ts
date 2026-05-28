@@ -228,6 +228,17 @@ function handleCloseBuzzer(state: RoomState, senderId: string): ApplyResult {
 function handleRevealFinalCategory(state: RoomState, senderId: string): ApplyResult {
   if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
   if (state.phase !== 'roundComplete') return { ok: false, error: 'Round not complete' };
+  // If no one is eligible to play Final Jeopardy (everyone has score ≤ 0),
+  // skip Final Jeopardy entirely and go straight to gameOver to avoid a deadlock.
+  if (eligibleForFinal(state).length === 0) {
+    return {
+      ok: true,
+      state: {
+        ...state,
+        phase: 'gameOver',
+      },
+    };
+  }
   return {
     ok: true,
     state: {
