@@ -1,6 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useGameState } from '../hooks/useGameState';
 import { Lobby } from '../components/Lobby';
+import { GameBoard } from '../components/GameBoard';
+import { Scoreboard } from '../components/Scoreboard';
 
 export function Room() {
   const { code } = useParams<{ code: string }>();
@@ -15,9 +17,11 @@ export function Room() {
   }
 
   return (
-    <main className="p-6">
-      <h1 className="text-xl font-bold">Room {code}</h1>
-      <p>Phase: {state.phase}</p>
-    </main>
+    <div className="flex min-h-screen">
+      <main className="flex-1">
+        <GameBoard state={state} me={me} send={send} />
+      </main>
+      <Scoreboard state={state} />
+    </div>
   );
 }
