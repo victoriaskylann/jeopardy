@@ -81,3 +81,59 @@ describe('submitFinalWager', () => {
     expect(applyEvent(state, { type: 'submitFinalWager', wager: 100 }, 'p2').ok).toBe(false);
   });
 });
+
+describe('revealFinalClue', () => {
+  it('host can reveal clue once all eligible players have wagered', () => {
+    let state = roundCompleteRoom({ p0: 1000, p1: 500, p2: -100 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 500 }, 'p1') as any).state;
+    const result = applyEvent(state, { type: 'revealFinalClue' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('finalClueShown');
+  });
+
+  it('rejects reveal before all eligible players have wagered', () => {
+    let state = roundCompleteRoom({ p0: 1000, p1: 500 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    const result = applyEvent(state, { type: 'revealFinalClue' }, 'host');
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe('submitFinalAnswer', () => {
+  it('eligible player can submit an answer; lands in submitted list', () => {
+    let state = roundCompleteRoom({ p0: 1000, p1: 500 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 500 }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalClue' }, 'host') as any).state;
+    const result = applyEvent(state, { type: 'submitFinalAnswer', answer: 'Westphalia' }, 'p0');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.finalJeopardy?.answers.p0).toBe('Westphalia');
+    expect(result.state.finalJeopardy?.submitted).toContain('p0');
+  });
+
+  it('when all eligible players submit, auto-transitions to finalReveal', () => {
+    let state = roundCompleteRoom({ p0: 1000, p1: 500 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 500 }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalClue' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalAnswer', answer: 'X' }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalAnswer', answer: 'Y' }, 'p1') as any).state;
+    expect(state.phase).toBe('finalReveal');
+  });
+
+  it('ineligible player (score ≤ 0) cannot submit answer', () => {
+    let state = roundCompleteRoom({ p0: 1000, p1: 0 });
+    state = (applyEvent(state, { type: 'revealFinalCategory' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'submitFinalWager', wager: 800 }, 'p0') as any).state;
+    state = (applyEvent(state, { type: 'revealFinalClue' }, 'host') as any).state;
+    const result = applyEvent(state, { type: 'submitFinalAnswer', answer: 'X' }, 'p1');
+    expect(result.ok).toBe(false);
+  });
+});

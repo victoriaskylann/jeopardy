@@ -50,6 +50,10 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleRevealFinalCategory(state, senderId);
     case 'submitFinalWager':
       return handleSubmitFinalWager(state, event.wager, senderId);
+    case 'revealFinalClue':
+      return handleRevealFinalClue(state, senderId);
+    case 'submitFinalAnswer':
+      return handleSubmitFinalAnswer(state, event.answer, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -245,6 +249,48 @@ function handleSubmitFinalWager(state: RoomState, wager: number, senderId: strin
         ...state.finalJeopardy,
         wagers: { ...state.finalJeopardy.wagers, [senderId]: wager },
       },
+    },
+  };
+}
+
+function eligibleForFinal(state: RoomState): string[] {
+  return state.players.filter((p) => (state.scores[p.id] ?? 0) > 0).map((p) => p.id);
+}
+
+function handleRevealFinalClue(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'finalCategoryShown') return { ok: false, error: 'Not awaiting reveal' };
+  if (!state.finalJeopardy) return { ok: false, error: 'No final state' };
+  const eligible = eligibleForFinal(state);
+  for (const id of eligible) {
+    if (state.finalJeopardy.wagers[id] === undefined) {
+      return { ok: false, error: 'Not all eligible players have wagered' };
+    }
+  }
+  return { ok: true, state: { ...state, phase: 'finalClueShown' } };
+}
+
+function handleSubmitFinalAnswer(state: RoomState, answer: string, senderId: string): ApplyResult {
+  if (state.phase !== 'finalClueShown') return { ok: false, error: 'Not accepting answers' };
+  if (!state.finalJeopardy) return { ok: false, error: 'No final state' };
+  const eligible = eligibleForFinal(state);
+  if (!eligible.includes(senderId)) return { ok: false, error: 'Not eligible' };
+
+  const submitted = state.finalJeopardy.submitted.includes(senderId)
+    ? state.finalJeopardy.submitted
+    : [...state.finalJeopardy.submitted, senderId];
+  const newFj = {
+    ...state.finalJeopardy,
+    answers: { ...state.finalJeopardy.answers, [senderId]: answer },
+    submitted,
+  };
+  const allSubmitted = eligible.every((id) => submitted.includes(id));
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: allSubmitted ? 'finalReveal' : state.phase,
+      finalJeopardy: newFj,
     },
   };
 }
