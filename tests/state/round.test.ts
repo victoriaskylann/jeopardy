@@ -63,3 +63,107 @@ describe('openBuzzer', () => {
     expect(result.ok).toBe(false);
   });
 });
+
+function openBuzzerRoom(): RoomState {
+  let state = startedRoom();
+  state = (applyEvent(state, { type: 'selectClue', categoryIdx: 0, clueIdx: 0 }, 'p0') as any).state;
+  state = (applyEvent(state, { type: 'openBuzzer' }, 'host') as any).state;
+  return state;
+}
+
+describe('buzz', () => {
+  it('first buzz wins and transitions to judging', () => {
+    const result = applyEvent(openBuzzerRoom(), { type: 'buzz' }, 'p1');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('judging');
+    expect(result.state.buzzer).toEqual({ status: 'locked', winnerId: 'p1' });
+  });
+
+  it('second buzz is ignored once locked', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    const result = applyEvent(state, { type: 'buzz' }, 'p2');
+    expect(result.ok).toBe(false);
+  });
+
+  it('cannot buzz outside buzzerOpen', () => {
+    const result = applyEvent(startedRoom(), { type: 'buzz' }, 'p0');
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe('judgeCorrect', () => {
+  it('adds clue value to winner, makes them picker, returns to selectingClue', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    const result = applyEvent(state, { type: 'judgeCorrect' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('selectingClue');
+    expect(result.state.scores.p1).toBe(200);
+    expect(result.state.pickerId).toBe('p1');
+    expect(result.state.buzzer).toEqual({ status: 'closed' });
+    expect(result.state.selectedClue).toBeNull();
+  });
+
+  it('non-host cannot judge', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    const result = applyEvent(state, { type: 'judgeCorrect' }, 'p0');
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe('judgeWrong', () => {
+  it('subtracts clue value from winner and stays in judging', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    const result = applyEvent(state, { type: 'judgeWrong' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('judging');
+    expect(result.state.scores.p1).toBe(-200);
+    // Buzzer state stays locked; host can openBuzzer (re-open) or moveOn from here.
+  });
+
+  it('scores can go negative', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'judgeWrong' }, 'host') as any).state;
+    expect(state.scores.p1).toBe(-200);
+  });
+
+  it('reopen buzzer after wrong allows another buzz', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'judgeWrong' }, 'host') as any).state;
+    state = (applyEvent(state, { type: 'openBuzzer' }, 'host') as any).state;
+    expect(state.phase).toBe('buzzerOpen');
+    expect(state.buzzer.status).toBe('open');
+    const result = applyEvent(state, { type: 'buzz' }, 'p2');
+    expect(result.ok).toBe(true);
+  });
+});
+
+describe('moveOn', () => {
+  it('from judging after wrong: returns to selectingClue, picker unchanged', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'judgeWrong' }, 'host') as any).state;
+    const result = applyEvent(state, { type: 'moveOn' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('selectingClue');
+    expect(result.state.pickerId).toBe('p0'); // original picker
+    expect(result.state.buzzer.status).toBe('closed');
+  });
+
+  it('non-host cannot moveOn', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'buzz' }, 'p1') as any).state;
+    state = (applyEvent(state, { type: 'judgeWrong' }, 'host') as any).state;
+    const result = applyEvent(state, { type: 'moveOn' }, 'p0');
+    expect(result.ok).toBe(false);
+  });
+});

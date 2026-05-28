@@ -36,6 +36,14 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleSelectClue(state, event.categoryIdx, event.clueIdx, senderId);
     case 'openBuzzer':
       return handleOpenBuzzer(state, senderId);
+    case 'buzz':
+      return handleBuzz(state, senderId);
+    case 'judgeCorrect':
+      return handleJudge(state, true, senderId);
+    case 'judgeWrong':
+      return handleJudge(state, false, senderId);
+    case 'moveOn':
+      return handleMoveOn(state, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -143,5 +151,61 @@ function handleOpenBuzzer(state: RoomState, senderId: string): ApplyResult {
   return {
     ok: true,
     state: { ...state, phase: 'buzzerOpen', buzzer: { status: 'open', openedAt: Date.now() } },
+  };
+}
+
+function handleBuzz(state: RoomState, senderId: string): ApplyResult {
+  if (state.phase !== 'buzzerOpen') return { ok: false, error: 'Buzzer not open' };
+  const player = state.players.find((p) => p.id === senderId);
+  if (!player) return { ok: false, error: 'Not a player' };
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'judging',
+      buzzer: { status: 'locked', winnerId: senderId },
+    },
+  };
+}
+
+function getClueValue(state: RoomState): number {
+  if (!state.game || !state.selectedClue) return 0;
+  const { categoryIdx, clueIdx } = state.selectedClue;
+  return state.game.jeopardyRound.categories[categoryIdx].clues[clueIdx].value;
+}
+
+function handleJudge(state: RoomState, correct: boolean, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'judging') return { ok: false, error: 'Not in judging phase' };
+  if (state.buzzer.status !== 'locked') return { ok: false, error: 'No buzz to judge' };
+  const winnerId = state.buzzer.winnerId;
+  const value = getClueValue(state);
+  const newScore = (state.scores[winnerId] ?? 0) + (correct ? value : -value);
+  const scores = { ...state.scores, [winnerId]: newScore };
+
+  if (correct) {
+    return endClue(state, scores, winnerId);
+  }
+  // Wrong: stay in judging; host chooses openBuzzer (reopen) or moveOn.
+  return { ok: true, state: { ...state, scores } };
+}
+
+function handleMoveOn(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'judging') return { ok: false, error: 'Not in judging phase' };
+  return endClue(state, state.scores, state.pickerId);
+}
+
+function endClue(state: RoomState, scores: Record<string, number>, nextPicker: string | null): ApplyResult {
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'selectingClue',
+      buzzer: { status: 'closed' },
+      selectedClue: null,
+      scores,
+      pickerId: nextPicker,
+    },
   };
 }
