@@ -167,3 +167,40 @@ describe('moveOn', () => {
     expect(result.ok).toBe(false);
   });
 });
+
+describe('closeBuzzer (no one buzzed)', () => {
+  it('host can close buzzer; goes to judging so answer can be revealed', () => {
+    const state = openBuzzerRoom();
+    const result = applyEvent(state, { type: 'closeBuzzer' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.phase).toBe('judging');
+    expect(result.state.buzzer.status).toBe('closed');
+  });
+
+  it('moveOn from a no-buzz judging keeps picker', () => {
+    let state = openBuzzerRoom();
+    state = (applyEvent(state, { type: 'closeBuzzer' }, 'host') as any).state;
+    const result = applyEvent(state, { type: 'moveOn' }, 'host');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.pickerId).toBe('p0');
+    expect(result.state.phase).toBe('selectingClue');
+  });
+});
+
+describe('round completion', () => {
+  it('after all 30 clues are played, ending a clue transitions to roundComplete', () => {
+    // Play every clue. For brevity, just brute-force advance the board.
+    let state = startedRoom(2);
+    for (let cat = 0; cat < 6; cat++) {
+      for (let clue = 0; clue < 5; clue++) {
+        state = (applyEvent(state, { type: 'selectClue', categoryIdx: cat, clueIdx: clue }, state.pickerId!) as any).state;
+        state = (applyEvent(state, { type: 'openBuzzer' }, 'host') as any).state;
+        state = (applyEvent(state, { type: 'closeBuzzer' }, 'host') as any).state;
+        state = (applyEvent(state, { type: 'moveOn' }, 'host') as any).state;
+      }
+    }
+    expect(state.phase).toBe('roundComplete');
+  });
+});

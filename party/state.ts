@@ -44,6 +44,8 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleJudge(state, false, senderId);
     case 'moveOn':
       return handleMoveOn(state, senderId);
+    case 'closeBuzzer':
+      return handleCloseBuzzer(state, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -196,7 +198,34 @@ function handleMoveOn(state: RoomState, senderId: string): ApplyResult {
   return endClue(state, state.scores, state.pickerId);
 }
 
+function handleCloseBuzzer(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'buzzerOpen') return { ok: false, error: 'Buzzer not open' };
+  return {
+    ok: true,
+    state: {
+      ...state,
+      phase: 'judging',
+      buzzer: { status: 'closed' },
+    },
+  };
+}
+
 function endClue(state: RoomState, scores: Record<string, number>, nextPicker: string | null): ApplyResult {
+  const allRevealed = state.board?.revealed.every((row) => row.every((r) => r));
+  if (allRevealed) {
+    return {
+      ok: true,
+      state: {
+        ...state,
+        phase: 'roundComplete',
+        buzzer: { status: 'closed' },
+        selectedClue: null,
+        scores,
+        pickerId: null,
+      },
+    };
+  }
   return {
     ok: true,
     state: {
