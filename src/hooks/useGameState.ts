@@ -21,10 +21,14 @@ export function useGameState(roomCode: string) {
 
   useEffect(() => {
     const host = import.meta.env.VITE_PARTYKIT_HOST || 'localhost:1999';
+    const isHostIntent =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('host') === '1';
     const socket = new PartySocket({
       host,
       room: roomCode,
       id: getOrCreateClientId(),
+      query: isHostIntent ? { host: '1' } : undefined,
     });
     socketRef.current = socket;
 

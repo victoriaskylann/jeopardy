@@ -16,6 +16,18 @@ export function Room() {
 
   if (!state || !me) return <main className="p-6">Connecting to room {code}…</main>;
 
+  // If we landed in a room with no host (and we aren't claiming host ourselves),
+  // it means the room code doesn't correspond to an active room.
+  if (state.hostId === null && !me.isHost) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 p-6">
+        <h1 className="text-2xl font-bold">Room not found</h1>
+        <p>Ask the host for a valid room code.</p>
+        <a href="/" className="text-blue-600 underline">Go home</a>
+      </main>
+    );
+  }
+
   if (state.phase === 'lobby') {
     return <Lobby state={state} me={me} send={send} roomCode={code!} />;
   }

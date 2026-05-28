@@ -19,10 +19,15 @@ export default class JeopardyServer implements Party.Server {
     if (stored) this.state = stored;
   }
 
-  async onConnect(conn: Party.Connection) {
-    // First-ever connection to a fresh room claims host automatically.
+  async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
+    // Only treat a connection as a host claim if it signals intent via
+    // `?host=1` (set when the user came from the /host setup flow). Otherwise
+    // a typo'd room code would silently promote a player to host of a brand
+    // new room rather than surfacing "room not found".
+    const isHostIntent =
+      new URL(ctx.request.url).searchParams.get('host') === '1';
     const isFirstEver = this.state.hostId === null && this.state.players.length === 0;
-    if (isFirstEver) {
+    if (isFirstEver && isHostIntent) {
       const result = applyEvent(this.state, { type: 'claimHost' }, conn.id);
       if (result.ok) {
         this.state = result.state;
