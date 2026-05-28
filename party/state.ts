@@ -58,6 +58,8 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleRevealFinalPlayer(state, event.playerId, event.correct, senderId);
     case 'endGame':
       return handleEndGame(state, senderId);
+    case 'kickPlayer':
+      return handleKickPlayer(state, event.playerId, senderId);
     default:
       return { ok: false, error: `Unhandled event: ${event.type}` };
   }
@@ -347,6 +349,41 @@ function handleEndGame(state: RoomState, senderId: string): ApplyResult {
       game: null,
       finalJeopardy: null,
     },
+  };
+}
+
+function handleKickPlayer(state: RoomState, playerId: string, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (!state.players.find((p) => p.id === playerId)) {
+    return { ok: false, error: 'Unknown player' };
+  }
+  const players = state.players.filter((p) => p.id !== playerId);
+  const scores = { ...state.scores };
+  delete scores[playerId];
+  let pickerId = state.pickerId;
+  if (pickerId === playerId) {
+    pickerId = players[0]?.id ?? null;
+  }
+  return { ok: true, state: { ...state, players, scores, pickerId } };
+}
+
+export function markDisconnected(state: RoomState, playerId: string): RoomState {
+  if (!state.players.find((p) => p.id === playerId)) return state;
+  return {
+    ...state,
+    players: state.players.map((p) =>
+      p.id === playerId ? { ...p, connected: false } : p,
+    ),
+  };
+}
+
+export function markReconnected(state: RoomState, playerId: string): RoomState {
+  if (!state.players.find((p) => p.id === playerId)) return state;
+  return {
+    ...state,
+    players: state.players.map((p) =>
+      p.id === playerId ? { ...p, connected: true } : p,
+    ),
   };
 }
 
