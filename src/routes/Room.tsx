@@ -5,6 +5,7 @@ import { GameBoard } from '../components/GameBoard';
 import { Scoreboard } from '../components/Scoreboard';
 import { ClueModal } from '../components/ClueModal';
 import { FinalJeopardy } from '../components/FinalJeopardy';
+import { GameOver } from '../components/GameOver';
 
 const CLUE_PHASES = ['clueRevealed', 'buzzerOpen', 'judging'] as const;
 const FJ_PHASES = ['roundComplete', 'finalCategoryShown', 'finalClueShown', 'finalReveal'];
@@ -24,6 +25,17 @@ export function Room() {
       <div className="flex min-h-screen">
         <main className="flex-1">
           <FinalJeopardy state={state} me={me} send={send} />
+        </main>
+        <Scoreboard state={state} />
+      </div>
+    );
+  }
+
+  if (state.phase === 'gameOver') {
+    return (
+      <div className="flex min-h-screen">
+        <main className="flex-1">
+          <GameOver state={state} me={me} send={send} />
         </main>
         <Scoreboard state={state} />
       </div>
