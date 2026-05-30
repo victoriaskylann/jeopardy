@@ -13,12 +13,12 @@ export function HostHeader({ title }: Props) {
             id="checker"
             x="0"
             y="0"
-            width="36"
-            height="36"
+            width="56"
+            height="56"
             patternUnits="userSpaceOnUse"
           >
-            <rect width="18" height="18" fill="#b89a3e" />
-            <rect x="18" y="18" width="18" height="18" fill="#b89a3e" />
+            <rect width="28" height="28" fill="#b89a3e" />
+            <rect x="28" y="28" width="28" height="28" fill="#b89a3e" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="#f3e8d0" />
