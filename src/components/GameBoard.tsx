@@ -14,13 +14,13 @@ export function GameBoard({ state, me, send }: Props) {
   const isPicker = state.pickerId === me.playerId;
 
   return (
-    <div className="grid grid-cols-6 gap-3 p-6">
+    <div className="grid grid-cols-6 gap-1.5 p-3 sm:gap-3 sm:p-6">
       {state.game.jeopardyRound.categories.map((cat, catIdx) => (
         <div
           key={catIdx}
-          className="flex h-28 items-center justify-center rounded-2xl bg-teal-dark p-3 text-center"
+          className="flex h-16 items-center justify-center rounded-lg bg-teal-dark p-1 text-center sm:h-28 sm:rounded-2xl sm:p-3"
         >
-          <span className="font-display text-lg leading-tight text-cream-light">
+          <span className="font-display text-[10px] leading-tight text-cream-light sm:text-lg">
             {cat.name}
           </span>
         </div>

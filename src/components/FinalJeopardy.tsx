@@ -20,9 +20,9 @@ export function FinalJeopardy({ state, me, send }: Props) {
 
   if (state.phase === 'roundComplete') {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-12 text-center">
+      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-6 text-center sm:p-12">
         <p className={eyebrow}>round complete</p>
-        <h2 className="font-display text-5xl font-semibold text-teal">
+        <h2 className="font-display text-3xl font-semibold text-teal sm:text-5xl">
           On to Final Jeopardy
         </h2>
         {me.isHost && (
@@ -72,10 +72,10 @@ function WagerStage({
   const eligibleCount = state.players.filter((p) => (state.scores[p.id] ?? 0) > 0).length;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 p-10 text-center">
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-5 text-center sm:gap-8 sm:p-10">
       <div>
         <p className={eyebrow}>Final Jeopardy</p>
-        <h2 className="mt-2 font-display text-5xl font-semibold text-teal">
+        <h2 className="mt-2 font-display text-3xl font-semibold text-teal sm:text-5xl">
           {category}
         </h2>
       </div>
@@ -136,9 +136,9 @@ function AnswerStage({
   const submitted = state.finalJeopardy?.submitted.includes(me.playerId) ?? false;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 p-10 text-center">
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-5 text-center sm:gap-8 sm:p-10">
       <p className={eyebrow}>Final Jeopardy</p>
-      <p className="font-display text-3xl font-medium leading-snug text-teal">
+      <p className="font-display text-2xl font-medium leading-snug text-teal sm:text-3xl">
         {clue}
       </p>
 
@@ -189,16 +189,16 @@ function RevealStage({
   const nextToReveal = eligibleIds.find((id) => !fjState.revealed.includes(id));
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-10 text-center">
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-5 text-center sm:p-10">
       <p className={eyebrow}>Final Jeopardy</p>
-      <p className="font-display text-2xl font-medium text-teal">{fj.clue}</p>
+      <p className="font-display text-xl font-medium text-teal sm:text-2xl">{fj.clue}</p>
       <p className="rounded-2xl bg-peach px-6 py-3 text-teal">
         Correct answer:{' '}
         <span className="font-display text-xl text-mustard-dark">{fj.answer}</span>
       </p>
 
       {nextToReveal ? (
-        <div className="w-full rounded-3xl bg-cream-light p-8">
+        <div className="w-full rounded-3xl bg-cream-light p-6 sm:p-8">
           <p className="mb-4 font-display text-2xl font-semibold text-teal">
             {state.players.find((p) => p.id === nextToReveal)?.nickname}
           </p>

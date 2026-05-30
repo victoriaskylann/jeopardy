@@ -61,7 +61,7 @@ export function Room() {
 
   if (FJ_PHASES.includes(state.phase)) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen flex-col md:flex-row">
         <main className="flex-1">
           <FinalJeopardy state={state} me={me} send={send} />
         </main>
@@ -73,7 +73,7 @@ export function Room() {
 
   if (state.phase === 'gameOver') {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen flex-col md:flex-row">
         <main className="flex-1">
           <GameOver state={state} me={me} send={send} />
         </main>
@@ -84,7 +84,7 @@ export function Room() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
       <main className="flex-1">
         <GameBoard state={state} me={me} send={send} />
       </main>

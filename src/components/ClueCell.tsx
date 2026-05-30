@@ -9,7 +9,7 @@ export function ClueCell({ value, revealed, isPicker, onClick }: Props) {
   const clickable = isPicker && !revealed;
   return (
     <button
-      className={`flex aspect-[4/3] items-center justify-center rounded-2xl font-display text-3xl font-semibold transition ${
+      className={`flex aspect-[4/3] items-center justify-center rounded-lg font-display text-base font-semibold transition sm:rounded-2xl sm:text-2xl md:text-3xl ${
         revealed
           ? 'bg-lavender-light text-transparent'
           : 'bg-teal text-mustard'

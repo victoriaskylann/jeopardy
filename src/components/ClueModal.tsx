@@ -17,23 +17,23 @@ export function ClueModal({ state, me, send }: Props) {
   const showAnswer = me.isHost && state.phase !== 'buzzerOpen';
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-teal-dark/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-3xl rounded-3xl bg-teal p-10 text-cream-light shadow-2xl">
-        <div className="mb-6 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.3em] text-mustard">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-teal-dark/70 p-3 backdrop-blur-sm sm:p-4">
+      <div className="flex max-h-[95vh] w-full max-w-3xl flex-col overflow-y-auto rounded-2xl bg-teal p-5 text-cream-light shadow-2xl sm:rounded-3xl sm:p-10">
+        <div className="mb-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.25em] text-mustard sm:mb-6 sm:gap-3 sm:text-xs sm:tracking-[0.3em]">
           <span>{category}</span>
           <span className="text-cream-light/40">•</span>
           <span>${clue.value}</span>
         </div>
-        <p className="mb-10 text-center font-display text-3xl font-medium leading-snug text-cream-light">
+        <p className="mb-6 text-center font-display text-xl font-medium leading-snug text-cream-light sm:mb-10 sm:text-3xl">
           {clue.clue}
         </p>
         {showAnswer && (
-          <p className="mb-8 rounded-2xl bg-teal-dark px-5 py-4 text-center text-lg text-mustard">
-            <span className="text-xs uppercase tracking-[0.3em] text-mustard/70">
+          <p className="mb-6 rounded-2xl bg-teal-dark px-4 py-3 text-center text-mustard sm:mb-8 sm:px-5 sm:py-4">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-mustard/70 sm:text-xs sm:tracking-[0.3em]">
               answer
             </span>
             <br />
-            <span className="font-display text-2xl">{clue.answer}</span>
+            <span className="font-display text-lg sm:text-2xl">{clue.answer}</span>
           </p>
         )}
         <div className="flex flex-col items-center gap-3">

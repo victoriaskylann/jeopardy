@@ -92,7 +92,7 @@ function PlayerBuzzer({ state, me, send }: { state: RoomState; me: Me; send: (e:
 
   return (
     <button
-      className={`h-32 w-full rounded-3xl font-display text-3xl font-semibold transition ${
+      className={`h-40 w-full select-none rounded-3xl font-display text-4xl font-semibold transition sm:h-32 sm:text-3xl ${
         open
           ? 'bg-terracotta text-cream-light shadow-lg active:scale-95 hover:bg-terracotta-dark'
           : 'bg-lavender-light text-teal/40'
