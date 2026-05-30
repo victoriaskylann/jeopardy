@@ -60,6 +60,8 @@ export type GamePhase =
   | 'finalReveal'
   | 'gameOver';
 
+export type TypedAnswer = { playerId: string; answer: string };
+
 export type RoomState = {
   phase: GamePhase;
   hostId: string | null;
@@ -71,6 +73,9 @@ export type RoomState = {
   buzzer: BuzzerState;
   pickerId: string | null;
   scores: Record<string, number>;
+  typedAnswers: TypedAnswer[];
+  answerRevealed: boolean;
+  clueJudgment: 'correct' | 'wrong' | null;
   finalJeopardy: FinalJeopardyState | null;
 };
 
@@ -88,6 +93,9 @@ export type ClientEvent =
   | { type: 'judgeCorrect' }
   | { type: 'judgeWrong' }
   | { type: 'moveOn' }
+  | { type: 'submitTypedAnswer'; answer: string }
+  | { type: 'revealAnswer' }
+  | { type: 'awardTypedAnswer'; playerId: string }
   | { type: 'revealFinalCategory' }
   | { type: 'submitFinalWager'; wager: number }
   | { type: 'revealFinalClue' }

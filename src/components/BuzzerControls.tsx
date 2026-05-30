@@ -1,5 +1,6 @@
-import type { ClientEvent, RoomState } from "../types";
-import type { Me } from "../hooks/useGameState";
+import { useState } from 'react';
+import type { ClientEvent, RoomState } from '../types';
+import type { Me } from '../hooks/useGameState';
 
 type Props = {
   state: RoomState;
@@ -8,7 +9,7 @@ type Props = {
 };
 
 const pillBase =
-  "rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40";
+  'rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40';
 
 export function BuzzerControls({ state, me, send }: Props) {
   if (me.isHost) {
@@ -24,63 +25,75 @@ function HostControls({
   state: RoomState;
   send: (e: ClientEvent) => void;
 }) {
-  if (state.phase === "clueRevealed") {
+  if (state.phase === 'clueRevealed') {
     return (
       <button
         className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
-        onClick={() => send({ type: "openBuzzer" })}
+        onClick={() => send({ type: 'openBuzzer' })}
       >
         Open Buzzer
       </button>
     );
   }
-  if (state.phase === "buzzerOpen") {
+
+  if (state.phase === 'buzzerOpen') {
     return (
       <button
         className={`${pillBase} bg-lavender text-teal-dark hover:bg-lavender/80`}
-        onClick={() => send({ type: "closeBuzzer" })}
+        onClick={() => send({ type: 'closeBuzzer' })}
       >
         No One
       </button>
     );
   }
-  if (state.phase === "judging") {
-    const buzzerLocked = state.buzzer.status === "locked";
-    return (
-      <div className="flex flex-wrap justify-center gap-3">
-        {buzzerLocked && (
-          <>
-            <button
-              className={`${pillBase} bg-mustard text-cream-light hover:bg-teal-dark`}
-              onClick={() => send({ type: "judgeCorrect" })}
-            >
-              Correct
-            </button>
-            <button
-              className={`${pillBase} bg-terracotta text-cream-light hover:bg-terracotta-dark`}
-              onClick={() => send({ type: "judgeWrong" })}
-            >
-              Wrong
-            </button>
-          </>
-        )}
-        {!buzzerLocked && (
-          <button
-            className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
-            onClick={() => send({ type: "openBuzzer" })}
-          >
-            Reopen Buzzer
-          </button>
-        )}
+
+  if (state.phase === 'judging') {
+    // Step 1: must reveal answer before judging.
+    if (!state.answerRevealed) {
+      return (
         <button
-          className={`${pillBase} bg-lavender text-teal-dark hover:bg-lavender/80`}
-          onClick={() => send({ type: "moveOn" })}
+          className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
+          onClick={() => send({ type: 'revealAnswer' })}
         >
-          Move On
+          Reveal Answer
         </button>
-      </div>
+      );
+    }
+
+    // Step 2: judge Correct/Wrong while a buzz is locked in.
+    if (state.clueJudgment === null && state.buzzer.status === 'locked') {
+      return (
+        <div className="flex flex-wrap justify-center gap-3">
+          <button
+            className={`${pillBase} bg-teal-dark text-cream-light hover:bg-teal-dark/80`}
+            onClick={() => send({ type: 'judgeCorrect' })}
+          >
+            Correct
+          </button>
+          <button
+            className={`${pillBase} bg-terracotta text-cream-light hover:bg-terracotta-dark`}
+            onClick={() => send({ type: 'judgeWrong' })}
+          >
+            Wrong
+          </button>
+        </div>
+      );
+    }
+
+    // Step 3: wrap-up. After Correct: "Move On". After Wrong: "No One Got It"
+    // (Award buttons live next to each typed answer in ClueModal).
+    // No-buzz path lands here too (clueJudgment null + buzzer closed).
+    const label = state.clueJudgment === 'wrong' ? 'No One Got It' : 'Move On';
+    return (
+      <button
+        className={`${pillBase} bg-lavender text-teal-dark hover:bg-lavender/80`}
+        onClick={() => send({ type: 'moveOn' })}
+      >
+        {label}
+      </button>
     );
   }
+
   return null;
 }
 
@@ -93,9 +106,10 @@ function PlayerBuzzer({
   me: Me;
   send: (e: ClientEvent) => void;
 }) {
-  const open = state.phase === "buzzerOpen";
-  const youWon =
-    state.buzzer.status === "locked" && state.buzzer.winnerId === me.playerId;
+  const open = state.phase === 'buzzerOpen';
+  const buzzer = state.buzzer;
+  const isLocked = buzzer.status === 'locked';
+  const youWon = buzzer.status === 'locked' && buzzer.winnerId === me.playerId;
 
   if (youWon) {
     return (
@@ -105,17 +119,86 @@ function PlayerBuzzer({
     );
   }
 
+  // After a buzz, non-winners can type a quiet answer until the host reveals.
+  if (
+    state.phase === 'judging' &&
+    isLocked &&
+    !state.answerRevealed
+  ) {
+    return <TypedAnswerInput state={state} me={me} send={send} />;
+  }
+
+  // Typing window closed. Show what you typed (if anything) once host reveals.
+  if (state.phase === 'judging' && state.answerRevealed) {
+    const mine = state.typedAnswers.find((t) => t.playerId === me.playerId);
+    if (mine) {
+      return (
+        <div className="rounded-2xl bg-cream-light/90 px-6 py-3 text-center text-teal">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-mustard">
+            you typed
+          </p>
+          <p className="font-display text-lg">"{mine.answer}"</p>
+        </div>
+      );
+    }
+    return null;
+  }
+
   return (
     <button
       className={`h-40 w-full select-none rounded-3xl font-display text-4xl font-semibold transition sm:h-32 sm:text-3xl ${
         open
-          ? "bg-terracotta text-cream-light shadow-lg active:scale-95 hover:bg-terracotta-dark"
-          : "bg-lavender-light text-teal/40"
+          ? 'bg-terracotta text-cream-light shadow-lg active:scale-95 hover:bg-terracotta-dark'
+          : 'bg-lavender-light text-teal/40'
       }`}
       disabled={!open}
-      onClick={() => send({ type: "buzz" })}
+      onClick={() => send({ type: 'buzz' })}
     >
-      {open ? "BUZZ" : "Wait…"}
+      {open ? 'BUZZ' : 'Wait…'}
     </button>
+  );
+}
+
+function TypedAnswerInput({
+  state,
+  me,
+  send,
+}: {
+  state: RoomState;
+  me: Me;
+  send: (e: ClientEvent) => void;
+}) {
+  const mine = state.typedAnswers.find((t) => t.playerId === me.playerId);
+  const [draft, setDraft] = useState(mine?.answer ?? '');
+  return (
+    <form
+      className="flex w-full max-w-sm flex-col items-center gap-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const trimmed = draft.trim();
+        if (trimmed) send({ type: 'submitTypedAnswer', answer: trimmed });
+      }}
+    >
+      <p className="text-center text-[10px] uppercase tracking-[0.25em] text-mustard">
+        Type your guess
+      </p>
+      <input
+        className="w-full rounded-full border-2 border-mustard/60 bg-cream-light px-5 py-3 text-lg text-teal placeholder:text-teal/40 focus:border-mustard focus:outline-none"
+        placeholder="What is…"
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+      />
+      <button
+        type="submit"
+        className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
+        disabled={!draft.trim()}
+      >
+        {mine ? 'Update' : 'Submit'}
+      </button>
+      {mine && (
+        <p className="text-xs text-teal/70">Last submitted: "{mine.answer}"</p>
+      )}
+    </form>
   );
 }

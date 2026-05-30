@@ -13,6 +13,9 @@ export function createInitialState(): RoomState {
     buzzer: { status: 'closed' },
     pickerId: null,
     scores: {},
+    typedAnswers: [],
+    answerRevealed: false,
+    clueJudgment: null,
     finalJeopardy: null,
   };
 }
@@ -39,10 +42,16 @@ export function applyEvent(state: RoomState, event: ClientEvent, senderId: strin
       return handleOpenBuzzer(state, senderId);
     case 'buzz':
       return handleBuzz(state, senderId);
+    case 'submitTypedAnswer':
+      return handleSubmitTypedAnswer(state, event.answer, senderId);
+    case 'revealAnswer':
+      return handleRevealAnswer(state, senderId);
     case 'judgeCorrect':
       return handleJudge(state, true, senderId);
     case 'judgeWrong':
       return handleJudge(state, false, senderId);
+    case 'awardTypedAnswer':
+      return handleAwardTypedAnswer(state, event.playerId, senderId);
     case 'moveOn':
       return handleMoveOn(state, senderId);
     case 'closeBuzzer':
@@ -156,13 +165,17 @@ function handleSelectClue(state: RoomState, categoryIdx: number, clueIdx: number
       phase: 'clueRevealed',
       selectedClue: { categoryIdx, clueIdx },
       board: { revealed },
+      // Reset per-clue state.
+      typedAnswers: [],
+      answerRevealed: false,
+      clueJudgment: null,
     },
   };
 }
 
 function handleOpenBuzzer(state: RoomState, senderId: string): ApplyResult {
   if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
-  if (state.phase !== 'clueRevealed' && state.phase !== 'judging') {
+  if (state.phase !== 'clueRevealed') {
     return { ok: false, error: 'Cannot open buzzer in current phase' };
   }
   return {
@@ -185,6 +198,31 @@ function handleBuzz(state: RoomState, senderId: string): ApplyResult {
   };
 }
 
+function handleSubmitTypedAnswer(state: RoomState, answer: string, senderId: string): ApplyResult {
+  if (state.phase !== 'judging') return { ok: false, error: 'Not accepting typed answers' };
+  if (state.buzzer.status !== 'locked') return { ok: false, error: 'Buzzer not locked' };
+  if (state.answerRevealed) return { ok: false, error: 'Typing window closed' };
+  if (senderId === state.buzzer.winnerId) {
+    return { ok: false, error: 'Buzzed-in player answers verbally' };
+  }
+  if (!state.players.find((p) => p.id === senderId)) {
+    return { ok: false, error: 'Not a player' };
+  }
+  const existing = state.typedAnswers.findIndex((t) => t.playerId === senderId);
+  const typedAnswers =
+    existing >= 0
+      ? state.typedAnswers.map((t, i) => (i === existing ? { playerId: senderId, answer } : t))
+      : [...state.typedAnswers, { playerId: senderId, answer }];
+  return { ok: true, state: { ...state, typedAnswers } };
+}
+
+function handleRevealAnswer(state: RoomState, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'judging') return { ok: false, error: 'Not in judging phase' };
+  if (state.answerRevealed) return { ok: false, error: 'Already revealed' };
+  return { ok: true, state: { ...state, answerRevealed: true } };
+}
+
 function getClueValue(state: RoomState): number {
   if (!state.game || !state.selectedClue) return 0;
   const { categoryIdx, clueIdx } = state.selectedClue;
@@ -194,18 +232,49 @@ function getClueValue(state: RoomState): number {
 function handleJudge(state: RoomState, correct: boolean, senderId: string): ApplyResult {
   if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
   if (state.phase !== 'judging') return { ok: false, error: 'Not in judging phase' };
+  if (!state.answerRevealed) return { ok: false, error: 'Reveal the answer first' };
+  if (state.clueJudgment !== null) return { ok: false, error: 'Already judged' };
   if (state.buzzer.status !== 'locked') return { ok: false, error: 'No buzz to judge' };
+
   const winnerId = state.buzzer.winnerId;
   const value = getClueValue(state);
   const newScore = (state.scores[winnerId] ?? 0) + (correct ? value : -value);
   const scores = { ...state.scores, [winnerId]: newScore };
 
   if (correct) {
-    return endClue(state, scores, winnerId);
+    // Stays in judging so the host can review typed answers (informational)
+    // and then click Move On. Picker is now the winner.
+    return {
+      ok: true,
+      state: { ...state, scores, pickerId: winnerId, clueJudgment: 'correct' },
+    };
   }
-  // Wrong: stay in judging so the host can still see the answer. Clear the
-  // buzzer lock so the UI flips from Correct/Wrong to Reopen/Move On.
-  return { ok: true, state: { ...state, scores, buzzer: { status: 'closed' } } };
+  // Wrong: close the buzzer, mark judgment. Host can either award a typed
+  // answer or click Move On (no one got it).
+  return {
+    ok: true,
+    state: {
+      ...state,
+      scores,
+      buzzer: { status: 'closed' },
+      clueJudgment: 'wrong',
+    },
+  };
+}
+
+function handleAwardTypedAnswer(state: RoomState, playerId: string, senderId: string): ApplyResult {
+  if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
+  if (state.phase !== 'judging') return { ok: false, error: 'Not in judging phase' };
+  if (state.clueJudgment !== 'wrong') {
+    return { ok: false, error: 'Can only award after the buzzer answer was wrong' };
+  }
+  const entry = state.typedAnswers.find((t) => t.playerId === playerId);
+  if (!entry) return { ok: false, error: 'That player has no typed answer' };
+
+  const value = getClueValue(state);
+  const newScore = (state.scores[playerId] ?? 0) + value;
+  const scores = { ...state.scores, [playerId]: newScore };
+  return endClue(state, scores, playerId);
 }
 
 function handleMoveOn(state: RoomState, senderId: string): ApplyResult {
@@ -217,12 +286,15 @@ function handleMoveOn(state: RoomState, senderId: string): ApplyResult {
 function handleCloseBuzzer(state: RoomState, senderId: string): ApplyResult {
   if (state.hostId !== senderId) return { ok: false, error: 'Only host' };
   if (state.phase !== 'buzzerOpen') return { ok: false, error: 'Buzzer not open' };
+  // No one buzzed — there's no typing window to gate, so auto-reveal the
+  // answer so the host can read it aloud.
   return {
     ok: true,
     state: {
       ...state,
       phase: 'judging',
       buzzer: { status: 'closed' },
+      answerRevealed: true,
     },
   };
 }
@@ -359,6 +431,9 @@ function handleEndGame(state: RoomState, senderId: string): ApplyResult {
       buzzer: { status: 'closed' },
       pickerId: null,
       scores: {},
+      typedAnswers: [],
+      answerRevealed: false,
+      clueJudgment: null,
       game: null,
       finalJeopardy: null,
     },
@@ -402,15 +477,21 @@ export function markReconnected(state: RoomState, playerId: string): RoomState {
 
 function endClue(state: RoomState, scores: Record<string, number>, nextPicker: string | null): ApplyResult {
   const allRevealed = state.board?.revealed.every((row) => row.every((r) => r));
+  const baseResetForNextClue = {
+    buzzer: { status: 'closed' as const },
+    selectedClue: null,
+    scores,
+    typedAnswers: [],
+    answerRevealed: false,
+    clueJudgment: null,
+  };
   if (allRevealed) {
     return {
       ok: true,
       state: {
         ...state,
+        ...baseResetForNextClue,
         phase: 'roundComplete',
-        buzzer: { status: 'closed' },
-        selectedClue: null,
-        scores,
         pickerId: null,
       },
     };
@@ -419,10 +500,8 @@ function endClue(state: RoomState, scores: Record<string, number>, nextPicker: s
     ok: true,
     state: {
       ...state,
+      ...baseResetForNextClue,
       phase: 'selectingClue',
-      buzzer: { status: 'closed' },
-      selectedClue: null,
-      scores,
       pickerId: nextPicker,
     },
   };
