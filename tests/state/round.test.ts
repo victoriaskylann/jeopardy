@@ -124,7 +124,8 @@ describe('judgeWrong', () => {
     if (!result.ok) return;
     expect(result.state.phase).toBe('judging');
     expect(result.state.scores.p1).toBe(-200);
-    // Buzzer state stays locked; host can openBuzzer (re-open) or moveOn from here.
+    // Buzzer unlocks so the host's UI flips from Correct/Wrong to Reopen/Move On.
+    expect(result.state.buzzer).toEqual({ status: 'closed' });
   });
 
   it('scores can go negative', () => {

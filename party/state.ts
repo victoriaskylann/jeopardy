@@ -203,8 +203,9 @@ function handleJudge(state: RoomState, correct: boolean, senderId: string): Appl
   if (correct) {
     return endClue(state, scores, winnerId);
   }
-  // Wrong: stay in judging; host chooses openBuzzer (reopen) or moveOn.
-  return { ok: true, state: { ...state, scores } };
+  // Wrong: stay in judging so the host can still see the answer. Clear the
+  // buzzer lock so the UI flips from Correct/Wrong to Reopen/Move On.
+  return { ok: true, state: { ...state, scores, buzzer: { status: 'closed' } } };
 }
 
 function handleMoveOn(state: RoomState, senderId: string): ApplyResult {
