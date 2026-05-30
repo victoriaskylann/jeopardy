@@ -2,7 +2,7 @@ type Props = { title: string };
 
 export function HostHeader({ title }: Props) {
   return (
-    <header className="relative flex h-20 items-center justify-center overflow-hidden bg-cream-light">
+    <header className="relative flex h-28 items-center justify-center overflow-hidden bg-cream-light">
       <svg
         className="absolute inset-0 h-full w-full"
         xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@ export function HostHeader({ title }: Props) {
         <rect width="100%" height="100%" fill="#f3e8d0" />
         <rect width="100%" height="100%" fill="url(#checker)" />
       </svg>
-      <h1 className="relative z-10 w-1/2 rounded-full bg-cream-light px-8 py-2 text-center font-display text-3xl font-semibold tracking-tight text-teal">
+      <h1 className="relative z-10 w-1/4 rounded-full bg-cream-light px-8 py-3 text-center font-display text-4xl font-semibold tracking-tight text-teal">
         {title}
       </h1>
     </header>
