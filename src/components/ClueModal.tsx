@@ -27,6 +27,12 @@ export function ClueModal({ state, me, send }: Props) {
   const needsReveal = me.isHost && inJudging && !hasRevealedAnswer;
   const showAnswer = me.isHost && inJudging && hasRevealedAnswer;
 
+  const buzzer = state.buzzer;
+  const answeringPlayer =
+    buzzer.status === 'locked'
+      ? state.players.find((p) => p.id === buzzer.winnerId)
+      : null;
+
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-teal-dark/70 p-3 backdrop-blur-sm sm:p-4">
       <div className="flex max-h-[95vh] w-full max-w-3xl flex-col overflow-y-auto rounded-2xl bg-teal p-5 text-cream-light shadow-2xl sm:rounded-3xl sm:p-10">
@@ -38,6 +44,18 @@ export function ClueModal({ state, me, send }: Props) {
         <p className="mb-6 text-center font-display text-xl font-medium leading-snug text-cream-light sm:mb-10 sm:text-3xl">
           {clue.clue}
         </p>
+
+        {inJudging && answeringPlayer && (
+          <div className="mb-5 rounded-2xl bg-peach px-5 py-3 text-center sm:mb-6">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-mustard sm:text-xs sm:tracking-[0.3em]">
+              Answering
+            </p>
+            <p className="font-display text-xl font-semibold text-teal sm:text-2xl">
+              {answeringPlayer.nickname}
+            </p>
+          </div>
+        )}
+
         {showAnswer && (
           <p className="mb-6 rounded-2xl bg-teal-dark px-4 py-3 text-center text-mustard sm:mb-8 sm:px-5 sm:py-4">
             <span className="text-[10px] uppercase tracking-[0.25em] text-mustard/70 sm:text-xs sm:tracking-[0.3em]">
