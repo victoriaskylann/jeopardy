@@ -6,6 +6,7 @@ import { Scoreboard } from '../components/Scoreboard';
 import { ClueModal } from '../components/ClueModal';
 import { FinalJeopardy } from '../components/FinalJeopardy';
 import { GameOver } from '../components/GameOver';
+import { HostHeader } from '../components/HostHeader';
 
 const CLUE_PHASES = ['clueRevealed', 'buzzerOpen', 'judging'] as const;
 const FJ_PHASES = ['roundComplete', 'finalCategoryShown', 'finalClueShown', 'finalReveal'];
@@ -55,17 +56,29 @@ export function Room() {
       </div>
     ) : null;
 
+  const header = me.isHost ? (
+    <HostHeader title={state.game?.title ?? 'jepardy'} />
+  ) : null;
+
   if (state.phase === 'lobby') {
-    return <Lobby state={state} me={me} send={send} roomCode={code!} />;
+    return (
+      <>
+        {header}
+        <Lobby state={state} me={me} send={send} roomCode={code!} />
+      </>
+    );
   }
 
   if (FJ_PHASES.includes(state.phase)) {
     return (
-      <div className="flex min-h-screen flex-col md:flex-row">
-        <main className="flex-1">
-          <FinalJeopardy state={state} me={me} send={send} />
-        </main>
-        <Scoreboard state={state} />
+      <div className="flex min-h-screen flex-col">
+        {header}
+        <div className="flex flex-1 flex-col md:flex-row">
+          <main className="flex-1">
+            <FinalJeopardy state={state} me={me} send={send} />
+          </main>
+          <Scoreboard state={state} />
+        </div>
         {overlay}
       </div>
     );
@@ -73,22 +86,28 @@ export function Room() {
 
   if (state.phase === 'gameOver') {
     return (
-      <div className="flex min-h-screen flex-col md:flex-row">
-        <main className="flex-1">
-          <GameOver state={state} me={me} send={send} />
-        </main>
-        <Scoreboard state={state} />
+      <div className="flex min-h-screen flex-col">
+        {header}
+        <div className="flex flex-1 flex-col md:flex-row">
+          <main className="flex-1">
+            <GameOver state={state} me={me} send={send} />
+          </main>
+          <Scoreboard state={state} />
+        </div>
         {overlay}
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <main className="flex-1">
-        <GameBoard state={state} me={me} send={send} />
-      </main>
-      <Scoreboard state={state} />
+    <div className="flex min-h-screen flex-col">
+      {header}
+      <div className="flex flex-1 flex-col md:flex-row">
+        <main className="flex-1">
+          <GameBoard state={state} me={me} send={send} />
+        </main>
+        <Scoreboard state={state} />
+      </div>
       {CLUE_PHASES.includes(state.phase as any) && (
         <ClueModal state={state} me={me} send={send} />
       )}
