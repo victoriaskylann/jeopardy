@@ -57,7 +57,7 @@ export function Room() {
     ) : null;
 
   const header = me.isHost ? (
-    <HostHeader title={state.game?.title ?? 'jepardy'} />
+    <HostHeader title={state.game?.title ?? 'Baby Trivia'} />
   ) : null;
 
   if (state.phase === 'lobby') {

@@ -12,11 +12,11 @@ export function Landing() {
   return (
     <main className="relative mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-10 p-6">
       <div className="flex flex-col items-center gap-2">
-        <span className="font-display text-7xl font-semibold leading-none text-teal">
-          jepardy
+        <span className="font-display text-6xl font-semibold leading-none text-teal">
+          Baby Trivia
         </span>
-        <span className="font-sans text-sm uppercase tracking-[0.3em] text-mustard">
-          a party game
+        <span className="text-center font-sans text-sm uppercase tracking-[0.3em] text-mustard">
+          Victoria and Jordan's baby shower
         </span>
       </div>
 
