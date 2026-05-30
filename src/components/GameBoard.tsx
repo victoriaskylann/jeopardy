@@ -118,11 +118,11 @@ function DesktopBoard({ state, me, send }: Props) {
   const isPicker = state.pickerId === me.playerId;
 
   return (
-    <div className="hidden grid-cols-6 gap-3 p-6 md:grid">
+    <div className="hidden h-full grid-cols-6 grid-rows-[auto_repeat(5,minmax(0,1fr))] gap-3 p-6 md:grid">
       {state.game.jeopardyRound.categories.map((cat, catIdx) => (
         <div
           key={catIdx}
-          className="flex h-28 items-center justify-center rounded-2xl bg-teal-dark p-3 text-center"
+          className="flex min-h-20 items-center justify-center rounded-2xl bg-teal-dark p-3 text-center"
         >
           <span className="font-display text-lg leading-tight text-cream-light">
             {cat.name}

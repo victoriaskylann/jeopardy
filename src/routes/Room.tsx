@@ -100,10 +100,10 @@ export function Room() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col md:h-dvh md:min-h-0">
       {header}
-      <div className="flex flex-1 flex-col md:flex-row">
-        <main className="flex-1">
+      <div className="flex flex-1 flex-col md:flex-row md:overflow-hidden">
+        <main className="min-h-0 flex-1 md:overflow-hidden">
           <GameBoard state={state} me={me} send={send} />
         </main>
         <Scoreboard state={state} />
