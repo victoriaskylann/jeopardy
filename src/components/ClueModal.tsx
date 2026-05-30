@@ -26,6 +26,9 @@ export function ClueModal({ state, me, send }: Props) {
   const inJudging = state.phase === 'judging';
   const needsReveal = me.isHost && inJudging && !hasRevealedAnswer;
   const showAnswer = me.isHost && inJudging && hasRevealedAnswer;
+  // Players don't see the clue text while the host is reading it; it appears
+  // only once the buzzer opens.
+  const showClue = me.isHost || state.phase !== 'clueRevealed';
 
   const buzzer = state.buzzer;
   const answeringPlayer =
@@ -41,9 +44,15 @@ export function ClueModal({ state, me, send }: Props) {
           <span className="text-cream-light/40">•</span>
           <span>${clue.value}</span>
         </div>
-        <p className="mb-6 text-center font-display text-xl font-medium leading-snug text-cream-light sm:mb-10 sm:text-3xl">
-          {clue.clue}
-        </p>
+        {showClue ? (
+          <p className="mb-6 text-center font-display text-xl font-medium leading-snug text-cream-light sm:mb-10 sm:text-3xl">
+            {clue.clue}
+          </p>
+        ) : (
+          <p className="mb-6 text-center font-display text-xl italic leading-snug text-cream-light/60 sm:mb-10 sm:text-3xl">
+            Listen for the host…
+          </p>
+        )}
 
         {inJudging && answeringPlayer && (
           <div className="mb-5 rounded-2xl bg-peach px-5 py-3 text-center sm:mb-6">
