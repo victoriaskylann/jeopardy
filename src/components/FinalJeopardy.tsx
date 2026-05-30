@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import type { ClientEvent, RoomState } from '../types';
-import type { Me } from '../hooks/useGameState';
+import { useState } from "react";
+import type { ClientEvent, RoomState } from "../types";
+import type { Me } from "../hooks/useGameState";
 
 type Props = {
   state: RoomState;
@@ -8,9 +8,9 @@ type Props = {
   send: (event: ClientEvent) => void;
 };
 
-const eyebrow = 'text-xs uppercase tracking-[0.3em] text-mustard';
+const eyebrow = "text-xs uppercase tracking-[0.3em] text-mustard";
 const pill =
-  'rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40';
+  "rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40";
 
 export function FinalJeopardy({ state, me, send }: Props) {
   if (!state.game) return null;
@@ -18,7 +18,7 @@ export function FinalJeopardy({ state, me, send }: Props) {
   const myScore = state.scores[me.playerId] ?? 0;
   const eligible = myScore > 0;
 
-  if (state.phase === 'roundComplete') {
+  if (state.phase === "roundComplete") {
     return (
       <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-6 text-center sm:p-12">
         <p className={eyebrow}>round complete</p>
@@ -28,7 +28,7 @@ export function FinalJeopardy({ state, me, send }: Props) {
         {me.isHost && (
           <button
             className={`${pill} mt-4 bg-mustard text-cream-light hover:bg-mustard-dark`}
-            onClick={() => send({ type: 'revealFinalCategory' })}
+            onClick={() => send({ type: "revealFinalCategory" })}
           >
             Reveal Final Category
           </button>
@@ -37,7 +37,7 @@ export function FinalJeopardy({ state, me, send }: Props) {
     );
   }
 
-  if (state.phase === 'finalCategoryShown') {
+  if (state.phase === "finalCategoryShown") {
     return (
       <WagerStage
         state={state}
@@ -50,13 +50,19 @@ export function FinalJeopardy({ state, me, send }: Props) {
     );
   }
 
-  if (state.phase === 'finalClueShown') {
+  if (state.phase === "finalClueShown") {
     return (
-      <AnswerStage state={state} me={me} send={send} clue={fj.clue} eligible={eligible} />
+      <AnswerStage
+        state={state}
+        me={me}
+        send={send}
+        clue={fj.clue}
+        eligible={eligible}
+      />
     );
   }
 
-  if (state.phase === 'finalReveal') {
+  if (state.phase === "finalReveal") {
     return <RevealStage state={state} me={me} send={send} fj={fj} />;
   }
 
@@ -64,12 +70,19 @@ export function FinalJeopardy({ state, me, send }: Props) {
 }
 
 function WagerStage({
-  state, me, send, category, eligible, myScore,
+  state,
+  me,
+  send,
+  category,
+  eligible,
+  myScore,
 }: Props & { category: string; eligible: boolean; myScore: number }) {
   const [wager, setWager] = useState(0);
   const submitted = state.finalJeopardy?.wagers[me.playerId] !== undefined;
   const wageredCount = Object.keys(state.finalJeopardy?.wagers ?? {}).length;
-  const eligibleCount = state.players.filter((p) => (state.scores[p.id] ?? 0) > 0).length;
+  const eligibleCount = state.players.filter(
+    (p) => (state.scores[p.id] ?? 0) > 0,
+  ).length;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-5 text-center sm:gap-8 sm:p-10">
@@ -83,7 +96,7 @@ function WagerStage({
       {eligible ? (
         submitted ? (
           <p className="rounded-2xl bg-cream-light px-6 py-3 text-teal">
-            Wager locked in. Waiting for others…{' '}
+            Wager locked in. Waiting for others…{" "}
             <span className="font-display text-mustard">
               ({wageredCount}/{eligibleCount})
             </span>
@@ -91,7 +104,8 @@ function WagerStage({
         ) : (
           <div className="flex w-full max-w-sm flex-col items-center gap-3">
             <label className="text-sm text-teal/70">
-              Your score: <span className="font-display text-teal">${myScore}</span>
+              Your score:{" "}
+              <span className="font-display text-teal">${myScore}</span>
             </label>
             <input
               type="number"
@@ -104,7 +118,7 @@ function WagerStage({
             <button
               className={`${pill} bg-teal text-cream-light hover:bg-teal-dark`}
               disabled={wager < 0 || wager > myScore || !Number.isFinite(wager)}
-              onClick={() => send({ type: 'submitFinalWager', wager })}
+              onClick={() => send({ type: "submitFinalWager", wager })}
             >
               Lock in wager
             </button>
@@ -120,7 +134,7 @@ function WagerStage({
         <button
           className={`${pill} bg-mustard text-cream-light hover:bg-mustard-dark`}
           disabled={wageredCount < eligibleCount}
-          onClick={() => send({ type: 'revealFinalClue' })}
+          onClick={() => send({ type: "revealFinalClue" })}
         >
           Reveal Final Clue
         </button>
@@ -130,10 +144,15 @@ function WagerStage({
 }
 
 function AnswerStage({
-  state, me, send, clue, eligible,
+  state,
+  me,
+  send,
+  clue,
+  eligible,
 }: Props & { clue: string; eligible: boolean }) {
-  const [answer, setAnswer] = useState('');
-  const submitted = state.finalJeopardy?.submitted.includes(me.playerId) ?? false;
+  const [answer, setAnswer] = useState("");
+  const submitted =
+    state.finalJeopardy?.submitted.includes(me.playerId) ?? false;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-5 text-center sm:gap-8 sm:p-10">
@@ -152,7 +171,7 @@ function AnswerStage({
             className="flex w-full max-w-md flex-col items-center gap-3"
             onSubmit={(e) => {
               e.preventDefault();
-              send({ type: 'submitFinalAnswer', answer });
+              send({ type: "submitFinalAnswer", answer });
             }}
           >
             <input
@@ -180,21 +199,30 @@ function AnswerStage({
 }
 
 function RevealStage({
-  state, me, send, fj,
+  state,
+  me,
+  send,
+  fj,
 }: Props & { fj: { category: string; clue: string; answer: string } }) {
   const fjState = state.finalJeopardy!;
   const eligibleIds = state.players
-    .filter((p) => (state.scores[p.id] ?? 0) > 0 || fjState.revealed.includes(p.id))
+    .filter(
+      (p) => (state.scores[p.id] ?? 0) > 0 || fjState.revealed.includes(p.id),
+    )
     .map((p) => p.id);
   const nextToReveal = eligibleIds.find((id) => !fjState.revealed.includes(id));
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-5 text-center sm:p-10">
       <p className={eyebrow}>Final Jeopardy</p>
-      <p className="font-display text-xl font-medium text-teal sm:text-2xl">{fj.clue}</p>
+      <p className="font-display text-xl font-medium text-teal sm:text-2xl">
+        {fj.clue}
+      </p>
       <p className="rounded-2xl bg-peach px-6 py-3 text-teal">
-        Correct answer:{' '}
-        <span className="font-display text-xl text-mustard-dark">{fj.answer}</span>
+        Correct answer:{" "}
+        <span className="font-display text-xl text-mustard-dark">
+          {fj.answer}
+        </span>
       </p>
 
       {nextToReveal ? (
@@ -212,19 +240,31 @@ function RevealStage({
             their answer
           </p>
           <p className="mb-6 font-display text-2xl text-teal-dark">
-            "{fjState.answers[nextToReveal] || '—'}"
+            "{fjState.answers[nextToReveal] || "—"}"
           </p>
           {me.isHost && (
             <div className="flex justify-center gap-3">
               <button
-                className={`${pill} bg-teal text-cream-light hover:bg-teal-dark`}
-                onClick={() => send({ type: 'revealFinalPlayer', playerId: nextToReveal, correct: true })}
+                className={`${pill} bg-mustard text-cream-light hover:bg-teal-dark`}
+                onClick={() =>
+                  send({
+                    type: "revealFinalPlayer",
+                    playerId: nextToReveal,
+                    correct: true,
+                  })
+                }
               >
                 Correct
               </button>
               <button
                 className={`${pill} bg-terracotta text-cream-light hover:bg-terracotta-dark`}
-                onClick={() => send({ type: 'revealFinalPlayer', playerId: nextToReveal, correct: false })}
+                onClick={() =>
+                  send({
+                    type: "revealFinalPlayer",
+                    playerId: nextToReveal,
+                    correct: false,
+                  })
+                }
               >
                 Wrong
               </button>

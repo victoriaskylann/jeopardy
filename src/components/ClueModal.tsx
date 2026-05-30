@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ClientEvent, RoomState } from '../types';
 import type { Me } from '../hooks/useGameState';
 import { BuzzerControls } from './BuzzerControls';
@@ -8,16 +9,23 @@ type Props = {
   send: (event: ClientEvent) => void;
 };
 
+const pillBase =
+  'rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40';
+
 export function ClueModal({ state, me, send }: Props) {
+  // Once revealed, stays revealed for the rest of this clue. The modal
+  // unmounts when phase returns to selectingClue, resetting this for the
+  // next clue.
+  const [hasRevealedAnswer, setHasRevealedAnswer] = useState(false);
+
   if (!state.selectedClue || !state.game) return null;
   const { categoryIdx, clueIdx } = state.selectedClue;
   const clue = state.game.jeopardyRound.categories[categoryIdx].clues[clueIdx];
   const category = state.game.jeopardyRound.categories[categoryIdx].name;
 
-  // Hide the answer from the host while reading the clue (clueRevealed) and
-  // while players are racing (buzzerOpen). It appears in `judging` — either
-  // after a buzz (locked) or after "No One" so the host can read it aloud.
-  const showAnswer = me.isHost && state.phase === 'judging';
+  const inJudging = state.phase === 'judging';
+  const needsReveal = me.isHost && inJudging && !hasRevealedAnswer;
+  const showAnswer = me.isHost && inJudging && hasRevealedAnswer;
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-teal-dark/70 p-3 backdrop-blur-sm sm:p-4">
@@ -40,7 +48,16 @@ export function ClueModal({ state, me, send }: Props) {
           </p>
         )}
         <div className="flex flex-col items-center gap-3">
-          <BuzzerControls state={state} me={me} send={send} />
+          {needsReveal ? (
+            <button
+              className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
+              onClick={() => setHasRevealedAnswer(true)}
+            >
+              Reveal Answer
+            </button>
+          ) : (
+            <BuzzerControls state={state} me={me} send={send} />
+          )}
         </div>
       </div>
     </div>
