@@ -1,0 +1,186 @@
+{
+  "id": "baby-edition",
+  "title": "Baby Edition",
+  "jeopardyRound": {
+    "categories": [
+      {
+        "name": "Pregnancy & Labor Signs",
+        "clues": [
+          {
+            "value": 200,
+            "clue": "This pregnancy symptom is caused by your uterus growing to start making room for the baby",
+            "answer": "What are cramps?"
+          },
+          {
+            "value": 400,
+            "clue": "Sharp Sudden nerve pain in the pelvis late in pregnancy is commonly known by this name",
+            "answer": "What is lightning crotch?"
+          },
+          {
+            "value": 600,
+            "clue": "HCH causes this pregnancy symptom",
+            "answer": "What is HCG"
+          },
+          {
+            "value": 800,
+            "clue": "When your cervix softens, thins, and shortens in preparation for birth.",
+            "answer": "What is effacement?"
+          },
+
+          {
+            "value": 1000,
+            "clue": "The guideline to know contractions are serious enough to go to the hospital",
+            "answer": "What is the 5-1-1 rule?"
+          }
+        ]
+      },
+      {
+        "name": "Newborn Care",
+        "clues": [
+          {
+            "value": 200,
+            "clue": "Tightly wrapping a baby in a blanket to mimic the snugness of the womb.",
+            "answer": "What is swaddling?"
+          },
+          {
+            "value": 400,
+            "clue": "Patches of dry, scaly, harmless skin commonly found on a newborn's scalp.",
+            "answer": "What is cradle cap?"
+          },
+          {
+            "value": 600,
+            "clue": "The average temperature of a newborn",
+            "answer": "What is 99.5 degrees?"
+          },
+          {
+            "value": 800,
+            "clue": "The sticky, dark green-black first stool a newborn passes.",
+            "answer": "What is meconium?"
+          },
+          {
+            "value": 1000,
+            "clue": "Pediatricians often recommend delaying a newborn's first bath until after this waxy protective coating has had time to absorb",
+            "answer": "What is vernix?"
+          }
+        ]
+      },
+      {
+        "name": "Newborn Facts",
+        "clues": [
+          {
+            "value": 200,
+            "clue": "Average weight in whole pounds of a full-term newborn.",
+            "answer": "What is 7?"
+          },
+          {
+            "value": 400,
+            "clue": "Approximate hours per day a newborn spends sleeping.",
+            "answer": "What is 16?"
+          },
+          {
+            "value": 600,
+            "clue": "Soft spots on a baby's head where the skull bones haven't fused.",
+            "answer": "What are fontanelles?"
+          },
+          {
+            "value": 800,
+            "clue": "Approximate number of bones a newborn is born with — more than an adult.",
+            "answer": "What is 300?"
+          },
+          {
+            "value": 1000,
+            "clue": "Startle reflex in which a newborn flings out their arms in response to a loud noise or sudden movement.",
+            "answer": "What is the Moro reflex?"
+          }
+        ]
+      },
+      {
+        "name": "Baby Animal Names",
+        "clues": [
+          { "value": 200, "clue": "A baby cow.", "answer": "What is a calf?" },
+          {
+            "value": 400,
+            "clue": "A baby kangaroo.",
+            "answer": "What is a joey?"
+          },
+          { "value": 600, "clue": "A baby goat.", "answer": "What is a kid?" },
+          {
+            "value": 800,
+            "clue": "A baby swan.",
+            "answer": "What is a cygnet?"
+          },
+          {
+            "value": 1000,
+            "clue": "A baby platypus or echidna.",
+            "answer": "What is a puggle?"
+          }
+        ]
+      },
+      {
+        "name": "Famous Fictional Babies",
+        "clues": [
+          {
+            "value": 200,
+            "clue": "Briefcase-toting executive in the 2017 DreamWorks animated film.",
+            "answer": "Who is the Boss Baby?"
+          },
+          {
+            "value": 400,
+            "clue": "Pixar baby in The Incredibles whose multiple powers (lasers, shapeshifting) emerge late in the film.",
+            "answer": "Who is Jack-Jack?"
+          },
+          {
+            "value": 600,
+            "clue": "A great dane puppy who is the nephew of a mystery solving cowardly dog",
+            "answer": "Who is Skrappy doo?"
+          },
+          {
+            "value": 800,
+            "clue": "Football-headed, world-domination-plotting baby on Family Guy.",
+            "answer": "Who is Stewie Griffin?"
+          },
+          {
+            "value": 1000,
+            "clue": "Half-vampire daughter of Bella and Edward in The Twilight Saga: Breaking Dawn.",
+            "answer": "Who is Renesmee?"
+          }
+        ]
+      },
+      {
+        "name": "Baby Milestones",
+        "clues": [
+          {
+            "value": 200,
+            "clue": "Typical age in months when most babies first roll over.",
+            "answer": "What is 4 (months)?"
+          },
+          {
+            "value": 400,
+            "clue": "Average age in months when babies start sitting up unassisted.",
+            "answer": "What is 6 (months)?"
+          },
+          {
+            "value": 600,
+            "clue": "When babies start smiling because they are happy (social smile)",
+            "answer": "What is 6-8 weeks?"
+          },
+          {
+            "value": 800,
+            "clue": "Cognitive milestone, developed around 8 months, of understanding that objects still exist when out of sight.",
+            "answer": "What is object permanence?"
+          },
+          {
+            "value": 1000,
+            "clue": "This fine motor milestone allows babies to pick up small objects using their thumb and forefinger",
+            "answer": "What is pincer grasp?"
+          }
+        ]
+      }
+    ]
+  },
+  "finalJeopardy": {
+    "category": "Baby Records",
+    "clue": "Born July 25, 1978 in Oldham, England, she became the world's first 'test tube' baby — conceived via in vitro fertilization.",
+    "answer": "Who is Louise Brown?"
+  }
+}
