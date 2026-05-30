@@ -8,6 +8,10 @@ type Props = {
   send: (event: ClientEvent) => void;
 };
 
+const eyebrow = 'text-xs uppercase tracking-[0.3em] text-mustard';
+const pill =
+  'rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40';
+
 export function FinalJeopardy({ state, me, send }: Props) {
   if (!state.game) return null;
   const fj = state.game.finalJeopardy;
@@ -16,12 +20,14 @@ export function FinalJeopardy({ state, me, send }: Props) {
 
   if (state.phase === 'roundComplete') {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-8 text-center">
-        <h2 className="text-3xl font-bold">Round complete!</h2>
-        <p>Ready for Final Jeopardy?</p>
+      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-12 text-center">
+        <p className={eyebrow}>round complete</p>
+        <h2 className="font-display text-5xl font-semibold text-teal">
+          On to Final Jeopardy
+        </h2>
         {me.isHost && (
           <button
-            className="rounded-lg bg-amber-500 px-6 py-3 font-bold text-white"
+            className={`${pill} mt-4 bg-mustard text-cream-light hover:bg-mustard-dark`}
             onClick={() => send({ type: 'revealFinalCategory' })}
           >
             Reveal Final Category
@@ -32,11 +38,22 @@ export function FinalJeopardy({ state, me, send }: Props) {
   }
 
   if (state.phase === 'finalCategoryShown') {
-    return <WagerStage state={state} me={me} send={send} category={fj.category} eligible={eligible} myScore={myScore} />;
+    return (
+      <WagerStage
+        state={state}
+        me={me}
+        send={send}
+        category={fj.category}
+        eligible={eligible}
+        myScore={myScore}
+      />
+    );
   }
 
   if (state.phase === 'finalClueShown') {
-    return <AnswerStage state={state} me={me} send={send} clue={fj.clue} eligible={eligible} />;
+    return (
+      <AnswerStage state={state} me={me} send={send} clue={fj.clue} eligible={eligible} />
+    );
   }
 
   if (state.phase === 'finalReveal') {
@@ -55,27 +72,38 @@ function WagerStage({
   const eligibleCount = state.players.filter((p) => (state.scores[p.id] ?? 0) > 0).length;
 
   return (
-    <div className="mx-auto max-w-2xl p-8 text-center">
-      <p className="mb-2 text-sm uppercase tracking-widest text-slate-500">Final Jeopardy</p>
-      <h2 className="mb-8 text-3xl font-bold">{category}</h2>
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 p-10 text-center">
+      <div>
+        <p className={eyebrow}>Final Jeopardy</p>
+        <h2 className="mt-2 font-display text-5xl font-semibold text-teal">
+          {category}
+        </h2>
+      </div>
 
       {eligible ? (
         submitted ? (
-          <p className="text-lg">Wager locked in. Waiting for others… ({wageredCount}/{eligibleCount})</p>
+          <p className="rounded-2xl bg-cream-light px-6 py-3 text-teal">
+            Wager locked in. Waiting for others…{' '}
+            <span className="font-display text-mustard">
+              ({wageredCount}/{eligibleCount})
+            </span>
+          </p>
         ) : (
-          <div className="flex flex-col items-center gap-3">
-            <label className="text-sm">Your score: ${myScore}</label>
+          <div className="flex w-full max-w-sm flex-col items-center gap-3">
+            <label className="text-sm text-teal/70">
+              Your score: <span className="font-display text-teal">${myScore}</span>
+            </label>
             <input
               type="number"
               min={0}
               max={myScore}
-              className="w-48 rounded-lg border px-3 py-2 text-2xl"
+              className="w-48 rounded-2xl border-2 border-teal/30 bg-cream-light px-4 py-3 text-center font-display text-3xl text-teal focus:border-teal focus:outline-none"
               value={wager}
               onChange={(e) => setWager(Number(e.target.value))}
             />
             <button
-              className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50"
-              disabled={wager < 0 || wager > myScore}
+              className={`${pill} bg-teal text-cream-light hover:bg-teal-dark`}
+              disabled={wager < 0 || wager > myScore || !Number.isFinite(wager)}
               onClick={() => send({ type: 'submitFinalWager', wager })}
             >
               Lock in wager
@@ -83,12 +111,14 @@ function WagerStage({
           </div>
         )
       ) : (
-        <p className="text-slate-500">You are not eligible for Final Jeopardy (score ≤ 0).</p>
+        <p className="rounded-2xl bg-lavender-light px-6 py-3 text-teal/70">
+          You're not eligible for Final Jeopardy (score ≤ 0).
+        </p>
       )}
 
       {me.isHost && (
         <button
-          className="mt-8 rounded-lg bg-amber-500 px-6 py-3 font-bold text-white disabled:opacity-50"
+          className={`${pill} bg-mustard text-cream-light hover:bg-mustard-dark`}
           disabled={wageredCount < eligibleCount}
           onClick={() => send({ type: 'revealFinalClue' })}
         >
@@ -106,31 +136,44 @@ function AnswerStage({
   const submitted = state.finalJeopardy?.submitted.includes(me.playerId) ?? false;
 
   return (
-    <div className="mx-auto max-w-2xl p-8 text-center">
-      <p className="mb-2 text-sm uppercase tracking-widest text-slate-500">Final Jeopardy</p>
-      <p className="mb-6 text-2xl font-semibold">{clue}</p>
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-8 p-10 text-center">
+      <p className={eyebrow}>Final Jeopardy</p>
+      <p className="font-display text-3xl font-medium leading-snug text-teal">
+        {clue}
+      </p>
 
       {eligible ? (
         submitted ? (
-          <p>Answer submitted. Waiting for host.</p>
+          <p className="rounded-2xl bg-cream-light px-6 py-3 text-teal">
+            Answer submitted. Waiting for host…
+          </p>
         ) : (
-          <div className="flex flex-col items-center gap-3">
+          <form
+            className="flex w-full max-w-md flex-col items-center gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              send({ type: 'submitFinalAnswer', answer });
+            }}
+          >
             <input
-              className="w-full rounded-lg border px-3 py-2 text-lg"
+              className="w-full rounded-full border-2 border-teal/30 bg-cream-light px-5 py-3 text-lg text-teal focus:border-teal focus:outline-none"
               placeholder="What is…"
+              autoFocus
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
             />
             <button
-              className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white"
-              onClick={() => send({ type: 'submitFinalAnswer', answer })}
+              type="submit"
+              className={`${pill} bg-teal text-cream-light hover:bg-teal-dark`}
             >
               Submit answer
             </button>
-          </div>
+          </form>
         )
       ) : (
-        <p className="text-slate-500">Spectating.</p>
+        <p className="rounded-2xl bg-lavender-light px-6 py-3 text-teal/70">
+          Spectating.
+        </p>
       )}
     </div>
   );
@@ -146,26 +189,41 @@ function RevealStage({
   const nextToReveal = eligibleIds.find((id) => !fjState.revealed.includes(id));
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
-      <p className="mb-2 text-center text-sm uppercase tracking-widest text-slate-500">Final Jeopardy</p>
-      <p className="mb-6 text-center text-2xl font-semibold">{fj.clue}</p>
-      <p className="mb-8 text-center text-amber-700">Correct answer: <b>{fj.answer}</b></p>
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 p-10 text-center">
+      <p className={eyebrow}>Final Jeopardy</p>
+      <p className="font-display text-2xl font-medium text-teal">{fj.clue}</p>
+      <p className="rounded-2xl bg-peach px-6 py-3 text-teal">
+        Correct answer:{' '}
+        <span className="font-display text-xl text-mustard-dark">{fj.answer}</span>
+      </p>
 
       {nextToReveal ? (
-        <div className="rounded-lg border bg-slate-50 p-6 text-center">
-          <p className="mb-3 text-lg font-medium">{state.players.find((p) => p.id === nextToReveal)?.nickname}</p>
-          <p className="mb-2">Wager: <b>${fjState.wagers[nextToReveal] ?? 0}</b></p>
-          <p className="mb-4 text-2xl">"{fjState.answers[nextToReveal] || '—'}"</p>
+        <div className="w-full rounded-3xl bg-cream-light p-8">
+          <p className="mb-4 font-display text-2xl font-semibold text-teal">
+            {state.players.find((p) => p.id === nextToReveal)?.nickname}
+          </p>
+          <p className="mb-1 text-xs uppercase tracking-[0.3em] text-mustard">
+            wager
+          </p>
+          <p className="mb-4 font-display text-3xl text-teal">
+            ${fjState.wagers[nextToReveal] ?? 0}
+          </p>
+          <p className="mb-1 text-xs uppercase tracking-[0.3em] text-mustard">
+            their answer
+          </p>
+          <p className="mb-6 font-display text-2xl text-teal-dark">
+            "{fjState.answers[nextToReveal] || '—'}"
+          </p>
           {me.isHost && (
             <div className="flex justify-center gap-3">
               <button
-                className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white"
+                className={`${pill} bg-teal text-cream-light hover:bg-teal-dark`}
                 onClick={() => send({ type: 'revealFinalPlayer', playerId: nextToReveal, correct: true })}
               >
                 Correct
               </button>
               <button
-                className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white"
+                className={`${pill} bg-terracotta text-cream-light hover:bg-terracotta-dark`}
                 onClick={() => send({ type: 'revealFinalPlayer', playerId: nextToReveal, correct: false })}
               >
                 Wrong
@@ -174,7 +232,7 @@ function RevealStage({
           )}
         </div>
       ) : (
-        <p className="text-center">All players revealed.</p>
+        <p className="text-teal/70">All players revealed.</p>
       )}
     </div>
   );

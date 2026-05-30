@@ -16,45 +16,86 @@ export function Lobby({ state, me, send, roomCode }: Props) {
   const [nickname, setNickname] = useState('');
 
   if (!me.isHost && !myPlayer) {
+    const submit = () => {
+      const trimmed = nickname.trim();
+      if (trimmed) send({ type: 'setNickname', nickname: trimmed });
+    };
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-6 p-6">
-        <h1 className="text-2xl font-bold">Join Room {roomCode}</h1>
-        <input
-          className="w-full rounded-lg border px-3 py-2 text-lg"
-          placeholder="Your nickname"
-          maxLength={24}
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-        />
-        <button
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50"
-          disabled={!nickname.trim()}
-          onClick={() => send({ type: 'setNickname', nickname: nickname.trim() })}
+      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-8 p-6">
+        <div className="flex flex-col items-center gap-2">
+          <span className="font-sans text-xs uppercase tracking-[0.3em] text-mustard">
+            joining room
+          </span>
+          <code className="rounded-full bg-lavender-light px-5 py-1 font-display text-3xl text-teal">
+            {roomCode}
+          </code>
+        </div>
+        <form
+          className="flex w-full flex-col gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
         >
-          Join
-        </button>
+          <input
+            aria-label="Your nickname"
+            className="w-full rounded-full border-2 border-teal/30 bg-cream-light px-5 py-3 text-lg text-teal placeholder:text-teal/40 focus:border-teal focus:outline-none"
+            placeholder="Your nickname"
+            maxLength={24}
+            autoFocus
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="rounded-full bg-mustard px-6 py-3 font-semibold text-cream-light shadow-sm transition hover:bg-mustard-dark disabled:opacity-40"
+            disabled={!nickname.trim()}
+          >
+            Join
+          </button>
+        </form>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-6">
+    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 p-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Lobby</h1>
-        <code className="rounded bg-slate-100 px-3 py-1 text-lg">{roomCode}</code>
+        <h1 className="font-display text-4xl font-semibold text-teal">Lobby</h1>
+        <div className="flex flex-col items-end">
+          <span className="text-xs uppercase tracking-[0.25em] text-mustard">
+            room code
+          </span>
+          <code className="font-display text-2xl text-teal">{roomCode}</code>
+        </div>
       </header>
 
       <section>
-        <h2 className="mb-2 font-medium">Players ({state.players.length}/20)</h2>
-        <ul className="divide-y rounded-lg border">
+        <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-mustard">
+          Players ({state.players.length}/20)
+        </h2>
+        <ul className="space-y-2">
           {state.players.map((p) => (
-            <li key={p.id} className="flex items-center justify-between px-3 py-2">
-              <span className={p.connected ? '' : 'opacity-50'}>{p.nickname}</span>
-              {!p.connected && <span className="text-xs text-slate-500">offline</span>}
+            <li
+              key={p.id}
+              className="flex items-center justify-between rounded-2xl bg-cream-light px-4 py-3"
+            >
+              <span
+                className={`text-teal ${p.connected ? '' : 'opacity-40'}`}
+              >
+                {p.nickname}
+              </span>
+              {!p.connected && (
+                <span className="text-xs uppercase tracking-wider text-terracotta">
+                  offline
+                </span>
+              )}
             </li>
           ))}
           {state.players.length === 0 && (
-            <li className="px-3 py-2 text-slate-500">Waiting for players…</li>
+            <li className="rounded-2xl bg-cream-light px-4 py-3 text-teal/50">
+              Waiting for players…
+            </li>
           )}
         </ul>
       </section>
@@ -62,25 +103,32 @@ export function Lobby({ state, me, send, roomCode }: Props) {
       {me.isHost && (
         <>
           <section>
-            <h2 className="mb-2 font-medium">Choose a game</h2>
-            <ul className="space-y-2">
-              {GAMES.map((g) => (
-                <li key={g.id}>
-                  <button
-                    className={`w-full rounded-lg border px-3 py-2 text-left ${
-                      state.game?.id === g.id ? 'border-blue-600 bg-blue-50' : ''
-                    }`}
-                    onClick={() => send({ type: 'selectGame', gameId: g.id })}
-                  >
-                    {g.title}
-                  </button>
-                </li>
-              ))}
+            <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-mustard">
+              Choose a game
+            </h2>
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {GAMES.map((g) => {
+                const selected = state.game?.id === g.id;
+                return (
+                  <li key={g.id}>
+                    <button
+                      className={`w-full rounded-2xl border-2 px-4 py-4 text-left font-display text-lg transition ${
+                        selected
+                          ? 'border-mustard bg-peach text-teal-dark'
+                          : 'border-transparent bg-cream-light text-teal hover:border-lavender'
+                      }`}
+                      onClick={() => send({ type: 'selectGame', gameId: g.id })}
+                    >
+                      {g.title}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
           <button
-            className="rounded-lg bg-green-600 px-4 py-3 font-medium text-white disabled:opacity-50"
+            className="rounded-full bg-teal px-6 py-4 font-semibold text-cream-light shadow-sm transition hover:bg-teal-dark disabled:opacity-40"
             disabled={!state.game || state.players.length < 2}
             onClick={() => send({ type: 'startGame' })}
           >

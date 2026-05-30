@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import type { ClientEvent, RoomState } from '../types';
 import type { Me } from '../hooks/useGameState';
 import { ClueCell } from './ClueCell';
@@ -13,22 +14,29 @@ export function GameBoard({ state, me, send }: Props) {
   const isPicker = state.pickerId === me.playerId;
 
   return (
-    <div className="grid grid-cols-6 gap-2 p-4">
+    <div className="grid grid-cols-6 gap-3 p-6">
       {state.game.jeopardyRound.categories.map((cat, catIdx) => (
-        <div key={catIdx} className="flex h-24 items-center justify-center rounded-md bg-blue-900 p-2 text-center text-sm font-semibold uppercase text-white">
-          {cat.name}
+        <div
+          key={catIdx}
+          className="flex h-28 items-center justify-center rounded-2xl bg-teal-dark p-3 text-center"
+        >
+          <span className="font-display text-lg leading-tight text-cream-light">
+            {cat.name}
+          </span>
         </div>
       ))}
       {Array.from({ length: 5 }).map((_, clueIdx) => (
-        state.game!.jeopardyRound.categories.map((cat, catIdx) => (
-          <ClueCell
-            key={`${catIdx}-${clueIdx}`}
-            value={cat.clues[clueIdx].value}
-            revealed={state.board!.revealed[catIdx][clueIdx]}
-            isPicker={isPicker}
-            onClick={() => send({ type: 'selectClue', categoryIdx: catIdx, clueIdx })}
-          />
-        ))
+        <Fragment key={clueIdx}>
+          {state.game!.jeopardyRound.categories.map((cat, catIdx) => (
+            <ClueCell
+              key={`${catIdx}-${clueIdx}`}
+              value={cat.clues[clueIdx].value}
+              revealed={state.board!.revealed[catIdx][clueIdx]}
+              isPicker={isPicker}
+              onClick={() => send({ type: 'selectClue', categoryIdx: catIdx, clueIdx })}
+            />
+          ))}
+        </Fragment>
       ))}
     </div>
   );

@@ -7,6 +7,9 @@ type Props = {
   send: (event: ClientEvent) => void;
 };
 
+const pillBase =
+  'rounded-full px-6 py-3 font-semibold shadow-sm transition disabled:opacity-40';
+
 export function BuzzerControls({ state, me, send }: Props) {
   if (me.isHost) {
     return <HostControls state={state} send={send} />;
@@ -18,7 +21,7 @@ function HostControls({ state, send }: { state: RoomState; send: (e: ClientEvent
   if (state.phase === 'clueRevealed') {
     return (
       <button
-        className="rounded-lg bg-amber-500 px-6 py-3 text-lg font-bold text-white"
+        className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
         onClick={() => send({ type: 'openBuzzer' })}
       >
         Open Buzzer
@@ -28,7 +31,7 @@ function HostControls({ state, send }: { state: RoomState; send: (e: ClientEvent
   if (state.phase === 'buzzerOpen') {
     return (
       <button
-        className="rounded-lg bg-slate-600 px-6 py-3 font-medium text-white"
+        className={`${pillBase} bg-lavender text-teal-dark hover:bg-lavender/80`}
         onClick={() => send({ type: 'closeBuzzer' })}
       >
         No One
@@ -38,17 +41,17 @@ function HostControls({ state, send }: { state: RoomState; send: (e: ClientEvent
   if (state.phase === 'judging') {
     const buzzerLocked = state.buzzer.status === 'locked';
     return (
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         {buzzerLocked && (
           <>
             <button
-              className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white"
+              className={`${pillBase} bg-teal text-cream-light hover:bg-teal-dark`}
               onClick={() => send({ type: 'judgeCorrect' })}
             >
               Correct
             </button>
             <button
-              className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white"
+              className={`${pillBase} bg-terracotta text-cream-light hover:bg-terracotta-dark`}
               onClick={() => send({ type: 'judgeWrong' })}
             >
               Wrong
@@ -57,14 +60,14 @@ function HostControls({ state, send }: { state: RoomState; send: (e: ClientEvent
         )}
         {!buzzerLocked && (
           <button
-            className="rounded-lg bg-amber-500 px-4 py-2 font-medium text-white"
+            className={`${pillBase} bg-mustard text-cream-light hover:bg-mustard-dark`}
             onClick={() => send({ type: 'openBuzzer' })}
           >
             Reopen Buzzer
           </button>
         )}
         <button
-          className="rounded-lg bg-slate-600 px-4 py-2 font-medium text-white"
+          className={`${pillBase} bg-lavender text-teal-dark hover:bg-lavender/80`}
           onClick={() => send({ type: 'moveOn' })}
         >
           Move On
@@ -81,7 +84,7 @@ function PlayerBuzzer({ state, me, send }: { state: RoomState; me: Me; send: (e:
 
   if (youWon) {
     return (
-      <div className="rounded-lg bg-green-100 px-6 py-4 text-center text-xl font-bold text-green-900">
+      <div className="rounded-3xl bg-mustard px-8 py-6 text-center font-display text-2xl font-semibold text-cream-light shadow-sm">
         Your buzz! Answer aloud.
       </div>
     );
@@ -89,8 +92,10 @@ function PlayerBuzzer({ state, me, send }: { state: RoomState; me: Me; send: (e:
 
   return (
     <button
-      className={`h-32 w-full rounded-2xl text-2xl font-bold text-white transition ${
-        open ? 'bg-red-600 active:scale-95' : 'bg-slate-300'
+      className={`h-32 w-full rounded-3xl font-display text-3xl font-semibold transition ${
+        open
+          ? 'bg-terracotta text-cream-light shadow-lg active:scale-95 hover:bg-terracotta-dark'
+          : 'bg-lavender-light text-teal/40'
       }`}
       disabled={!open}
       onClick={() => send({ type: 'buzz' })}

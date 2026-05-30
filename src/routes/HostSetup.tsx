@@ -16,5 +16,9 @@ export function HostSetup() {
     navigate(`/play/${code}?host=1`, { replace: true });
   }, [navigate]);
 
-  return <main className="p-6">Creating room…</main>;
+  return (
+    <main className="flex min-h-screen items-center justify-center p-6">
+      <p className="font-display text-2xl text-teal">Creating room…</p>
+    </main>
+  );
 }

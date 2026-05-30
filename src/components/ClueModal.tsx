@@ -17,17 +17,23 @@ export function ClueModal({ state, me, send }: Props) {
   const showAnswer = me.isHost && state.phase !== 'buzzerOpen';
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 p-4">
-      <div className="w-full max-w-3xl rounded-2xl bg-blue-800 p-8 text-white">
-        <div className="mb-4 text-center text-sm uppercase tracking-widest text-amber-300">
-          {category} — ${clue.value}
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-teal-dark/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-3xl rounded-3xl bg-teal p-10 text-cream-light shadow-2xl">
+        <div className="mb-6 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.3em] text-mustard">
+          <span>{category}</span>
+          <span className="text-cream-light/40">•</span>
+          <span>${clue.value}</span>
         </div>
-        <p className="mb-8 text-center text-3xl font-semibold leading-tight">
+        <p className="mb-10 text-center font-display text-3xl font-medium leading-snug text-cream-light">
           {clue.clue}
         </p>
         {showAnswer && (
-          <p className="mb-6 rounded bg-blue-950 p-3 text-center text-lg text-amber-200">
-            Answer: {clue.answer}
+          <p className="mb-8 rounded-2xl bg-teal-dark px-5 py-4 text-center text-lg text-mustard">
+            <span className="text-xs uppercase tracking-[0.3em] text-mustard/70">
+              answer
+            </span>
+            <br />
+            <span className="font-display text-2xl">{clue.answer}</span>
           </p>
         )}
         <div className="flex flex-col items-center gap-3">

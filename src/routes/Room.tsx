@@ -14,26 +14,43 @@ export function Room() {
   const { code } = useParams<{ code: string }>();
   const { state, me, send } = useGameState(code!);
 
-  if (!state || !me) return <main className="p-6">Connecting to room {code}…</main>;
+  if (!state || !me) {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <p className="font-display text-2xl text-teal">
+          Connecting to room <span className="text-mustard">{code}</span>…
+        </p>
+      </main>
+    );
+  }
 
   // If we landed in a room with no host (and we aren't claiming host ourselves),
   // it means the room code doesn't correspond to an active room.
   if (state.hostId === null && !me.isHost) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 p-6">
-        <h1 className="text-2xl font-bold">Room not found</h1>
-        <p>Ask the host for a valid room code.</p>
-        <a href="/" className="text-blue-600 underline">Go home</a>
+      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 p-6 text-center">
+        <h1 className="font-display text-4xl font-semibold text-teal">
+          Room not found
+        </h1>
+        <p className="text-teal/70">Ask the host for a valid room code.</p>
+        <a
+          href="/"
+          className="rounded-full bg-mustard px-6 py-3 font-semibold text-cream-light shadow-sm transition hover:bg-mustard-dark"
+        >
+          Go home
+        </a>
       </main>
     );
   }
 
   const overlay =
     !state.hostConnected && state.phase !== 'lobby' ? (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-        <div className="rounded-2xl bg-white px-8 py-6 text-center shadow-xl">
-          <p className="text-lg font-semibold">Host disconnected</p>
-          <p className="text-slate-600">Waiting for them to reconnect…</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-teal-dark/70 p-4 backdrop-blur-sm">
+        <div className="rounded-3xl bg-cream-light px-10 py-8 text-center shadow-2xl">
+          <p className="font-display text-2xl font-semibold text-teal">
+            Host disconnected
+          </p>
+          <p className="mt-1 text-teal/70">Waiting for them to reconnect…</p>
         </div>
       </div>
     ) : null;

@@ -6,15 +6,16 @@ type Props = {
 };
 
 export function ClueCell({ value, revealed, isPicker, onClick }: Props) {
+  const clickable = isPicker && !revealed;
   return (
     <button
-      className={`flex aspect-[4/3] items-center justify-center rounded-md text-2xl font-bold transition ${
+      className={`flex aspect-[4/3] items-center justify-center rounded-2xl font-display text-3xl font-semibold transition ${
         revealed
-          ? 'bg-slate-200 text-transparent'
-          : 'bg-blue-700 text-amber-300 hover:bg-blue-600'
-      } ${!isPicker || revealed ? 'cursor-default' : 'cursor-pointer'}`}
-      onClick={isPicker && !revealed ? onClick : undefined}
-      disabled={!isPicker || revealed}
+          ? 'bg-lavender-light text-transparent'
+          : 'bg-teal text-mustard'
+      } ${clickable ? 'cursor-pointer hover:bg-teal-dark hover:scale-[1.02]' : 'cursor-default'}`}
+      onClick={clickable ? onClick : undefined}
+      disabled={!clickable}
     >
       ${value}
     </button>
