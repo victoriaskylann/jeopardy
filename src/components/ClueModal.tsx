@@ -14,7 +14,10 @@ export function ClueModal({ state, me, send }: Props) {
   const clue = state.game.jeopardyRound.categories[categoryIdx].clues[clueIdx];
   const category = state.game.jeopardyRound.categories[categoryIdx].name;
 
-  const showAnswer = me.isHost && state.phase !== 'buzzerOpen';
+  // Hide the answer from the host while reading the clue (clueRevealed) and
+  // while players are racing (buzzerOpen). It appears in `judging` — either
+  // after a buzz (locked) or after "No One" so the host can read it aloud.
+  const showAnswer = me.isHost && state.phase === 'judging';
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-teal-dark/70 p-3 backdrop-blur-sm sm:p-4">
